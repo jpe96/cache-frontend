@@ -1,0 +1,32 @@
+<div class="data-loading" >
+  <svg class="dataspinner" viewBox="25 25 50 50" *ngIf="!logData" [@fade]>
+    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+  </svg>
+</div>
+<div *ngIf="logData" [@fade]>
+  <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">date / time</th>
+          <th scope="col">user</th>
+          <th scope="col">action</th>
+          <th scope="col">type</th>
+          <th scope="col">dataid</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of logData.slice(position, position+20); let i = index">
+          <td>{{log.logid}}</td>
+          <td>{{log.time}}</td>
+          <td>{{log.username}}</td>
+          <td>{{log.logstate}}</td>
+          <td>{{log.logtext}}</td>
+          <td>{{log.logdataid}}</td>
+        </tr>
+      </tbody>
+    </table>
+    max. 20 elements are shown 
+    <mat-icon *ngIf="position>0" (click)="position=position-20;" style="cursor:pointer;">keyboard_arrow_left</mat-icon>
+    <mat-icon *ngIf="(position+20)<logData.length" (click)="position=position+20;" style="cursor:pointer;">keyboard_arrow_right</mat-icon>
+</div>

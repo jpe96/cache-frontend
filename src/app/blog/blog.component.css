@@ -1,0 +1,372 @@
+
+
+
+.bloglistElement{
+    width:100%;
+    line-height:30px;
+    cursor:pointer;
+}
+
+.bloglistElementText{
+    float:left;
+}
+
+
+.bloglistElementDate{
+    float:right;
+}
+
+.bloglistElementContainer{
+    width: 100%;
+    padding-top: 30px;
+    margin-top: 50px;
+    border-top: 1px #CCCCCC solid;
+}
+
+a{
+    cursor:pointer;
+    font-weight:bold;
+    text-decoration: underline !important;
+}
+
+.form-check{
+    line-height:25px;
+}
+
+.infoTitleJodit_new{
+    width:0px;
+    right:72px !important;
+    white-space: nowrap;
+}
+
+:host ::ng-deep .mat-form-field-appearance-fill,
+:host ::ng-deep .mat-form-field-flex{
+    padding:0 !important;
+    background:white !important;
+}
+
+:host ::ng-deep .mat-form-field-infix {
+    padding:0px;
+    border:0px;
+}
+
+:host ::ng-deep .mat-form-field-infix input{
+    padding:20px;
+    border-color: #DDD;
+    margin-top: 0px;
+    margin-left: 30px;
+}
+
+:host ::ng-deep .mat-input-element:disabled{
+    color:black;
+}
+
+:host ::ng-deep .mat-form-field-wrapper{
+    padding-bottom: 14px;
+}
+
+
+:host ::ng-deep .mat-form-field-suffix{     
+    width: 60px;
+    height: 60px;
+    left: 30px;
+    top: -1px;
+    border: 1px #CCC solid;
+    border-radius: 0px;
+    border-left: none;
+    padding-top: 2px;
+    padding-left: 2px;
+}
+
+:host ::ng-deep .mat-icon-button{   
+    top: 8px;
+    left: 7px;
+}
+
+.container_4col{
+    float:left;
+    width:100%;
+    cursor:pointer;
+    display:flex;
+    margin-bottom: 10px;
+}
+
+.container_1col{
+    float:left;
+    width:auto;
+    cursor:pointer;
+    display:flex;
+    margin-bottom: 10px;
+}
+
+.container_4col_text{
+    height:60px;
+    padding:21px;
+    border:1px #DDD solid;
+    border-left:none;
+    flex-grow:1;
+    -webkit-box-flex: 1;
+}
+
+.container_4col_field{
+    height:60px;
+    width:60px;
+    line-height:60px;
+    border:1px #DDD solid;
+    color: #AAA;
+    float:left;
+    text-align:center;
+}
+
+
+.list_icon{
+    margin-top: 7px;
+    position:relative;
+    top:50%;
+    margin-top:-12px;
+    cursor:pointer;
+    vertical-align:top;
+}
+
+.list_container{
+    background: white;
+}
+
+.container_4col_left{
+    border-left: 1px #DDD solid !important;
+    border-right:none;
+    white-space: nowrap;
+    width: calc(100% - 60px);
+    overflow:hidden;
+}
+
+.input_tag{
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 0px !important;
+    height: 19px !important;
+}
+
+.progress_bar{
+    margin-top:0px;
+    margin-bottom:15px;
+    margin-top: 140px;
+}
+
+.progress_bar_blog{
+    margin-top: 140px !important;
+    background:white;
+}
+
+.heroimage{
+    width:50%;
+    margin-bottom:10px;
+}
+
+.blog_content_box{
+    width:100%;
+    margin-top:10px;
+    display: flex;
+    flex-wrap: wrap;
+    background: #FAFAF7;
+}
+
+.blog_content_box_left{
+    border:1px #CCC solid;
+    width:calc(100% - 60px);
+    padding: 20px;
+}
+
+.blog_content_box_left_add{
+    padding:0 !important;
+}
+
+.blog_content_box_right{
+    width:60px;
+    border:1px #CCC solid;
+    border-left:0px;
+    padding: 17px;
+}
+
+.blog_media_youtube{
+    width: 100%;
+    height: 259px;
+}
+
+.add_tag_blog{
+    border:none;
+    height:58px;
+    margin:none;
+    background-color:white;
+    padding-left:22px;
+}
+
+.add_list_blog{
+    margin-bottom:0px !important;
+}
+
+.infoTitleInput{
+    top:19px !important;
+    height:0px;
+    color:#777 !important;
+}
+
+.blog_replic{
+    background: #FAFAF7;
+}
+
+
+
+.blog_image_box{
+    flex-grow:1;
+    -webkit-box-flex: 1;
+    background:white;
+    border:1px solid #DDD;
+    height:300px;
+    width: 48%;
+    margin:1%;
+    float:left;
+}
+
+.blog_image_image{
+    width:100%;
+    height:260px;
+    border-bottom:1px solid #DDD;
+    background-size:contain;
+    background-repeat:no-repeat;
+    background-position:center;
+    position:relative;
+}
+
+.blog_image_icons_upper_right{
+    position: absolute;
+    padding: 5px;
+    padding-bottom:0px;
+    border-left: 1px #DDD solid;
+    border-bottom: 1px #DDD solid;
+    top: 0;
+    right: 0;
+    width:34px;
+    background:white
+}
+
+.blog_image_icons_upper_right_icon{
+    cursor:pointer;
+    margin-bottom: 6px;
+}
+
+.blog_image_replaceimage{
+    padding: 5px;
+    border-right: 1px #DDD solid;
+    border-bottom: 1px #DDD solid;
+    position: absolute;
+}
+
+.blog_image_bar{
+    width:100%;
+    height:40px;
+    position:relative;
+    line-height: 38px;
+    padding-left: 12px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    word-break: break-all;
+}
+
+.blog_image_button{
+    position:absolute;
+    top: 0px;
+    right:0px;
+    width: 90px;
+    padding: 7px;
+    line-height: 20px;
+    background: white;
+    border-left:1px solid #DDD;
+    border-bottom: 1px solid #DDD;
+    cursor:pointer;
+}
+
+.blog_image_add_box{
+    background: none;
+    border: none;
+}
+
+.blog_image_add_box_inner{
+    width:100%;
+    background:white;
+}
+
+.blog_audio{
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 112px;
+}
+
+.pdf_preview_icon{
+    float: right;
+    margin-left: 10px;
+    margin-top: 2px;
+}
+
+.element_preview_background{
+    position:fixed;
+    opacity:0.2;
+    background-color:black;
+    width:100%;
+    height:100%;
+    z-index:19;
+    top:0;
+    left:0;
+}
+
+
+.element_preview_close{
+    width:20px;
+    height:20px;
+    position:absolute;
+    top:10px;
+    right:10px;
+    cursor:pointer;
+}
+
+.element_preview_pages{
+    position:absolute;
+    width:100%;
+    line-height:26px;
+    font-weight:bold;
+    font-size:12px;
+    padding-left:12px;
+    padding-right:12px;
+    bottom:-26px;
+}
+
+
+.iframe_frame{
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    border:none;
+}
+
+.iframe_box{
+    position:relative;
+    width:100%;
+    height: calc(100% - 26px)
+}
+
+.element_preview_box{
+    position:fixed;
+    z-index:20;
+    background-color:white;
+    width: 70%;
+    height: 90%;
+    left:15%;
+    top:30px;
+    overflow:hidden;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='220px'><text x='0' y='15' font-size='20' font-family='Arial'>Das PDF wird geladen...</text></svg>");
+    background-position:center;
+    background-repeat:no-repeat;
+}

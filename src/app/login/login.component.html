@@ -1,0 +1,28 @@
+<div class="login" [@fade]>
+  <form [formGroup]="loginForm" class="login-container" (ngSubmit)="login()">
+      <h1>
+        cache login
+      </h1>
+    <p [ngClass]="{ 'has-error': isSubmitted && formControls.username.errors }">
+      <input type="input" placeholder="username" formControlName="username">
+    </p>
+
+    <p [ngClass]="{ 'has-error': isSubmitted && formControls.password.errors }">
+      <input type="password" placeholder="password" formControlName="password">
+    </p>
+
+      <input type="submit" value="log in" class="button-login">
+
+      <div *ngIf="isSubmitted && formControls.username.errors" class="error" [@fade]>
+        <div *ngIf="formControls.username.errors.required">username is missing</div>
+      </div>
+  
+      <div *ngIf="isSubmitted && formControls.password.errors" class="error" [@fade]>
+        <div *ngIf="formControls.password.errors.required">password is missing</div>
+      </div>
+  
+      <div *ngIf="isSubmitted && loginFalse" class="error" [@fade]>
+        invalid username or password
+      </div>
+  </form>
+</div>

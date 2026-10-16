@@ -1,0 +1,26 @@
+<div id="doorman"  [@doormanAnimation]="doormanState" (@doormanAnimation.done)="doormanAnimationDone($event)">
+    <div id="loader_logo" [@loaderLogoAnimation]="loaderLogoState" (@loaderLogoAnimation.done)="loaderLogoAnimationDone($event)"></div>
+    <div class="doorman_container" id="doorman_container" *ngIf="frontendService.booklistLoaded" [@doormanContainerAnimation]="frontendService.booklistLoaded">
+        <ng-container *ngFor="let book of frontendService.booklist; last as isLast; even as isEven; index as index; trackBy: trackByBookId">
+            <div class="doorman_container_book"
+                [ngClass]="{'doorman_container_book_full':(isLast&&isEven), 'doorman_container_book_last':(isLast || (index==frontendService.booklist.length-2 && isEven)), 'doorman_container_book_notpublic': book.public==0}"
+                (click)="doormanBookClick(book)" (mouseenter)="doormanImageLoop(book.bookid)" (mouseleave)="doormanImageLoopStop(book)">
+                <div class="doorman_container_book_image" [@doormanImageFadeAnimation]="book.imageState1" [ngStyle]="{'background-image':'url(\'' + book.image1 + '\')'}"></div>
+                <div class="doorman_container_book_image" [@doormanImageFadeAnimation]="book.imageState2" [ngStyle]="{'background-image':'url(\'' + book.image2 + '\')'}" style="opacity:0"></div>
+                <div class="doorman_container_book_title"  [ngStyle]="{'cursor': book.public==1 ? 'pointer' : 'default' }"
+                    (click)="doormanBookCheckText(book.bookid);doormanBookClickTitle(book); $event.stopPropagation()" [attr.id]="'doorman_book'+book.bookid"
+                    (mouseenter)="!frontendService.mobileVersion && book.bookblurb && book.textState='show'"
+                    (mouseleave)="book.textState='hide'"  >
+                    <span class="doorman_container_book_title_text">{{book.bookname}}</span>
+                    <span class="doorman_container_book_title_strut"></span>
+                </div>
+                <div class="doorman_container_book_text" [@doormanBookTextAnimation]="book.textState"
+                (click)="doormanBookClickText(book)" [attr.id]="'doorman_book_text'+book.bookid"
+                (mouseenter)="!frontendService.mobileVersion && book.bookblurb && book.textState='show'"
+                (mouseleave)="book.textState='hide'">                    
+                    <div class="doorman_container_book_text_inner" [innerHTML]="book.bookblurb | sanitizeHtml"></div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>

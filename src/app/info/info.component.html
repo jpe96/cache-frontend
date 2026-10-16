@@ -1,0 +1,134 @@
+<div class="data-loading" >
+    <svg class="dataspinner" viewBox="25 25 50 50" *ngIf="!information" [@fade]>
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+    </svg>
+  </div>
+
+<div class="content">
+  <ul class="list-group" *ngIf="information" [@fade]>
+    <li class="list-group-item list-header" (click)="showInformation=!showInformation">
+            <span>Informationen Deutsch</span>
+            <span *ngIf="showInformation"><mat-icon>expand_more</mat-icon></span>
+            <span *ngIf="!showInformation"><mat-icon>expand_less</mat-icon></span>
+    </li>
+    <li class="list-group-item" *ngIf="!showInformation">
+
+      <div class="title">About Text</div>
+      <jodit-editor [(ngModel)]="information.about_text" (onBlur)="information.about_text = textReplaceTagsRegex(information.about_text)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+
+      <div class="title">Blog Text</div>
+      <jodit-editor [(ngModel)]="information.blog_text" (onBlur)="information.blog_text = textReplaceTagsRegex(information.blog_text)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+
+      <div class="title">
+        Impressum Anzeigetext
+      </div>
+      <jodit-editor [(ngModel)]="information.impressum_text" (onBlur)="information.impressum_text = textReplaceTagsRegex(information.impressum_text)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+
+      <div class="title">
+        Konzept und Entwicklung
+      </div>
+      <jodit-editor [(ngModel)]="information.impressum_field1" (onBlur)="information.impressum_field1 = textReplaceTagsRegex(information.impressum_field1)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+
+      <div class="title">
+        Schriften
+      </div>
+      <jodit-editor [(ngModel)]="information.impressum_field2" (onBlur)="information.impressum_field2 = textReplaceTagsRegex(information.impressum_field2)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+
+      <div class="title">
+        Danke
+      </div>
+      <jodit-editor [(ngModel)]="information.impressum_field3" (onBlur)="information.impressum_field3 = textReplaceTagsRegex(information.impressum_field3)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+    
+      <div class="title">
+        Kontakt
+      </div>
+      <jodit-editor [(ngModel)]="information.impressum_field4" (onBlur)="information.impressum_field4 = textReplaceTagsRegex(information.impressum_field4)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+
+      <div class="title">
+        Urheberrechte
+      </div>
+      <jodit-editor [(ngModel)]="information.impressum_field5" (onBlur)="information.impressum_field5 = textReplaceTagsRegex(information.impressum_field5)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+
+      <div class="distance"></div>
+      <button class="btn btn-success" (click)="saveInformation()">
+          Daten speichern
+      </button>
+    </li>
+  </ul>
+
+  <ul class="list-group" *ngIf="information" [@fade]>
+    <li class="list-group-item list-header" (click)="showInformationEn=!showInformationEn">
+            <span>Informationen Englisch</span>
+            <span *ngIf="showInformationEn"><mat-icon>expand_more</mat-icon></span>
+            <span *ngIf="!showInformationEn"><mat-icon>expand_less</mat-icon></span>
+    </li>
+    <li class="list-group-item" *ngIf="showInformationEn">
+
+      <div class="title">About Text</div>
+      <jodit-editor [(ngModel)]="information.about_text_en" (onBlur)="information.about_text_en = textReplaceTagsRegex(information.about_text_en)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+
+      <div class="title">
+        Imprint text
+      </div>
+      <jodit-editor [(ngModel)]="information.impressum_text_en" (onBlur)="information.impressum_text_en = textReplaceTagsRegex(information.impressum_text_en)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+      <div class="title">
+        Concept and Developement
+      </div>
+      <jodit-editor [(ngModel)]="information.impressum_field1_en" (onBlur)="information.impressum_field1_en = textReplaceTagsRegex(information.impressum_field1_en)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+
+      <div class="title">
+        Fonts
+      </div>
+      <jodit-editor [(ngModel)]="information.impressum_field2_en" (onBlur)="information.impressum_field2_en = textReplaceTagsRegex(information.impressum_field2_en)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+
+      <div class="title">
+        Thanks
+      </div>
+      <jodit-editor [(ngModel)]="information.impressum_field3_en" (onBlur)="information.impressum_field3_en = textReplaceTagsRegex(information.impressum_field3_en)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+    
+      <div class="title">
+        Contact
+      </div>
+      <jodit-editor [(ngModel)]="information.impressum_field4_en" (onBlur)="information.impressum_field4_en = textReplaceTagsRegex(information.impressum_field4_en)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+
+      <div class="title">
+        Copyrights
+      </div>
+      <jodit-editor [(ngModel)]="information.impressum_field5_en" (onBlur)="information.impressum_field5_en = textReplaceTagsRegex(information.impressum_field5_en)"
+      [config]="jodit_config"></jodit-editor>
+      <div class="distance"></div>
+
+      <button class="btn btn-success" (click)="saveInformation()">
+          Daten speichern
+      </button>
+    </li>
+  </ul>
+</div>

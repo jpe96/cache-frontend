@@ -1,0 +1,17 @@
+.list_col{
+    width:33%;
+    float:left;
+}
+
+.list-group-item-action{
+    cursor:pointer
+}
+
+.list_selected{
+    background-color:#EEE;
+}
+
+button{
+    padding: 12px;
+    width:auto !important;
+}

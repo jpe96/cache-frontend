@@ -1,0 +1,47 @@
+.alert_popup{
+    position:fixed;
+    top:100px;
+    left:50%;
+    width:500px;
+    margin-left:-250px;
+    z-index:401;
+}
+.alert_background{
+    z-index:400;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background-color:black;
+    opacity: 0.5;
+
+}
+
+.list.group{
+    border:0px;
+}
+.list-group-item{
+    border-radius:0px;
+    border:0px;
+}
+.list-group-item-danger{
+    color:white;
+    font-weight:bold;
+    background-color:red;
+}
+.list-group-item-success{
+    color:white;
+    font-weight:bold;
+    background-color:green;
+}
+.list-group-item-warning{
+    color:white;
+    font-weight:bold;
+    background-color:orange;
+}
+
+.alertMessage{
+    max-height:400px;
+    overflow:hidden;
+}

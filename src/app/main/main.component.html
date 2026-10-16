@@ -1,0 +1,19 @@
+<div id="body">
+    <app-header-frontend></app-header-frontend>
+    <app-doorman></app-doorman>
+    <app-blog-frontend></app-blog-frontend>
+    <app-about></app-about>
+    <app-impressum></app-impressum>
+    <app-book-frontend></app-book-frontend>
+    <app-materialarchiv></app-materialarchiv>
+    <div id="loaderTitle" *ngIf="loaderTitleState" [@loaderTitleAnimation]="loaderTitleState" (@loaderTitleAnimation.done)="loaderTitleAnimationDone($event)">
+        <div id="loaderTitleText">
+            {{loaderTitleText}}
+        </div>
+    </div>
+
+    <div id="cookie_box" *ngIf="showCookie">
+        <div id="cookie_text">Diese Website nutzt Cookies, um bestmögliche Funktionalität bieten zu können. Mit der Benützung dieser Seite erklären Sie sich mit der Verwendung von Cookies einverstanden.</div>
+        <div id="cookie_button" (click)="showCookie=false">ok</div>
+    </div>
+</div>

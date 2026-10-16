@@ -1,0 +1,80 @@
+<div class="data-loading" >
+    <svg class="dataspinner" viewBox="25 25 50 50" *ngIf="!allUser" [@fade]>
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+    </svg>
+</div>
+<div class="content">
+  <div *ngIf="allUser" [@fade]>
+    <div class="row">
+      <div class="col">
+
+        <ul class="list-group">
+          <li class="list-group-item list-header">
+                  <span>User</span>
+          </li>
+          <li class="list-group-item list-group-item-action" *ngFor="let user of allUser">
+            <div class="list_col">
+            {{user.userid}}. {{user.username}}
+            </div>
+            <div class="list_col">
+              {{permission[user.permission]}} <span *ngIf="user.permission==0">({{user.permission_book}})</span>
+            </div>
+            <div class="list_col" style="text-align:right;">
+              <mat-icon matTooltip="User l&ouml;schen" style="cursor:pointer;" (click)="deleteUser(user.userid)">delete</mat-icon>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="col">
+        <ul class="list-group">
+          <li class="list-group-item list-header">
+                  <span>Neuen User erstellen</span>
+          </li>
+          <li class="list-group-item">
+            <form [formGroup]="newUserForm"> 
+                <div class="form-group">
+                  <input type="input" class="form-control" id="newUserName" placeholder="Username" required formControlName="username">
+                </div>
+                <div class="form-group">
+                  <input type="password" class="form-control" id="newUserPassword" placeholder="Passwort eingeben" required formControlName="password">
+                </div>
+                <div class="form-group">
+                  <input type="password" class="form-control" id="newUserPassword2" placeholder="Password wiederholen" required formControlName="confirmpassword">
+                </div>
+                <div class="form-group">
+                    <label for="permission">Berechtigung ausw&auml;hlen</label>
+                    <select class="form-control" id="permission" formControlName="permission">
+                      <option value="1">Administrator</option>
+                      <option value="0">Autor</option>
+                      <option value="2">Viewer</option>
+                    </select>
+                </div>
+                <div class="form-group" *ngIf="newUserForm.value.permission==0">
+                    <select class="form-control" id="permission_book" formControlName="book">
+                        <option *ngFor="let book of allBook" value="{{book.bookid}}">{{book.bookname}}</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" (click)="createUser()">User erstellen</button>
+
+                <div *ngIf="isSubmitted && formControls.username.errors" class="error" [@fade]>
+                    <div *ngIf="formControls.username.errors.required">Username fehlt</div>
+                  </div>
+                <div *ngIf="isSubmitted && formControls.password.errors" class="error" [@fade]>
+                    <div *ngIf="formControls.password.errors.required">Passwort fehlt</div>
+                  </div>
+                  <div *ngIf="isSubmitted && formControls.confirmpassword.errors" class="error" [@fade]>
+                      <div *ngIf="formControls.confirmpassword.errors.required">Best&auml;tige das Passwort</div>
+                  </div>
+                  <div *ngIf="isSubmitted && newUserForm.value.password!=newUserForm.value.confirmpassword" class="error" [@fade]>
+                      <div>Die Passw&ouml;rter stimmen nicht &uuml;berein</div>
+                  </div>
+                  <div *ngIf="isSubmitted && usernameUsed" class="error" [@fade]>
+                      <div>Es existiert bereits ein User mit diesem Namen</div>
+                  </div>
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </div>
+</div>

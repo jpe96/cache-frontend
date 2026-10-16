@@ -1,0 +1,53 @@
+
+.edit_line{
+    margin: 25px 0px;
+    border-bottom: 1px #DDD solid;
+}
+
+.distance{
+    height:15px !important;
+}
+
+.error{
+    width:100%;
+    line-height:20px;
+    background-color:red;
+    color:white;
+    padding:10px;
+    font-weight:bold;
+    margin-top:10px;
+    float:left;
+}
+
+td:nth-child(even) input[type=text] {
+    padding:2px !important;
+ }
+
+
+.input_book{
+    border:1px #CCC solid;
+    height:38px;
+    line-height:38px;
+    margin-bottom:10px;
+}
+
+
+.infoTitle{
+    color: black;
+    position: relative;
+    top: 9px;
+    z-index: 20;
+    text-align: right;
+    right: 10px;
+    line-height: 15px;
+    float: right;
+}
+
+.box_newbook{
+    border: 1px #CCC solid;
+    padding:12px;
+}
+
+.maticon-list > mat-icon{
+    padding-right:35px;
+}

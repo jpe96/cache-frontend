@@ -1,0 +1,526 @@
+@media only screen and (max-width: 1080px) {
+
+	body {
+		min-height: 100vh;
+		min-height: -webkit-fill-available;
+		height:100% !important;
+	  }
+	html {
+	height: -webkit-fill-available;
+	}
+
+
+	/* COOKIE */
+
+	#cookie_text{
+		width:100%;
+		padding-left:0px;
+	}
+
+	#cookie_button{
+		position:relative;
+		top:0px;
+		right:0px;
+		margin-top:13px;
+		float:none;
+	}
+
+
+
+	/* PARTOVERVIEW */
+
+	#book{
+		height: 100%;
+		width: 100vw;
+		z-index:60;
+	}
+
+	#book_abstract{
+		width:92%;
+		position:relative;
+		left:4%;
+		right:4%;
+		margin-top:20px;
+		margin-bottom:20px;
+		font-size:18px;
+		line-height:24px;
+		transform:none;
+	}
+		
+	#book_title_text{
+		position:relative;
+		width:92%;
+		margin:0;
+		margin-top:55px;
+		position:relative;
+		left:4%;
+		right:4%;
+		text-transform: uppercase;
+	}
+
+	.book_baseline_text{
+		font-size:36px;
+	}
+
+	.book_baseline_strut{
+		height:42px;
+	}
+
+	.book_baseline_text_mobile{
+		line-height:40px !important
+	}
+
+
+	.infobox_right{
+		position:relative;
+		width:auto;
+		float:left;
+		left:0px;
+	}
+
+	.infobox_right_startpage{
+		margin:8px 0;
+	}
+
+
+	/* PART */
+
+	#partoverview{
+		position: absolute;
+		height: 100%;
+		width: 100vw;
+		overflow-y: scroll;
+		overflow-x: hidden;
+		z-index:60;
+		background:white;
+	}
+
+	.part_register_container{
+		height:200px;
+	}
+
+	.part_mobile{
+		position:relative;
+		width:100%;
+		height:200px;
+		background-size:cover;
+		background-repeat:no-repeat;
+	}
+
+	.part_mobile_register{
+		position:relative;
+		width:200%;
+		height:30px;
+		z-index:19;
+	}
+
+	.part_mobile_register_line_left{
+		position:relative;
+		float:left;
+		height:28px;
+		width:4vw;
+		border-bottom:2px solid white;
+	}
+
+	.part_mobile_register_line_right{
+		position:relative;
+		float:left;
+		height:28px;
+		border-bottom:2px solid white;
+		width: 50%;
+	}
+
+	.part_mobile_register_text{
+		position:relative;
+		float:left;
+		height:28px;
+		border:2px solid white;
+		border-bottom:0px;
+		text-transform: uppercase;
+		color:white;
+		padding:0 8px;
+	}
+
+	.partlist_baseline_text{
+		font-size:30px;
+		line-height:30px;
+		bottom:0;
+	}
+
+	.partlist_baseline_strut{
+		height:26px;
+	}
+
+
+	#chapteroverview{
+		position: absolute;
+		height: 100%;
+		width: 100vw;
+		overflow:hidden;
+		top:73px;
+		z-index:50;
+	}
+
+	#chapterheader{
+		position:absolute;
+		top:45px;
+		left:0px;
+		width:100vw;
+		min-height:28px;
+		background-color:white;
+		z-index:59;
+		text-transform: uppercase;
+	}
+
+
+	#chapterheader_booktitle{
+		display: flex;
+		flex-wrap: nowrap;
+		align-items: flex-start;
+		margin-top: -2px;
+	}
+
+
+	#chapterheader_booktitle_triangle, #chapterheader_booktitle_container {
+		flex: 0 0 auto;
+	}
+
+	#chapterheader_booktitle_container_chapter {
+		flex: 1 1 auto;
+	}
+
+
+	#chapterheader_booktitle_triangle{
+		margin-left: calc(4% - 11px);
+		margin-top:11px;
+		height: 0;
+		border-style: solid;
+		border-width: 5px 8px 5px 0;
+		border-color: transparent #000000 transparent transparent;
+	}
+
+	#chapterheader_booktitle_container{
+		margin-left:4px;
+		white-space: nowrap;
+		margin-right:30px;
+	}
+	#chapterheader_booktitle_container_chapter{
+		flex-grow: 1;
+		word-wrap: break-word;
+		margin-top: 5px;
+		line-height: 17px;
+		margin-bottom: 7px;
+	}
+
+	.chapterheader_booktitle_text{
+		line-height:0px;
+		font-size:12px;
+	}
+	
+	.chapterheader_booktitle_strut{
+		display: inline-block;
+		height:20px;
+	}
+
+	.chapteroverview_mobile{
+		position: absolute;
+		width:100vw;
+		height: calc(100% - 75px);
+		background:white;
+	}
+
+	.part_chapterlist_container{
+		position:absolute;
+		top:72px;
+		left:calc(4% + 10px);
+		z-index: 10;
+		color: white;
+		height: calc(100vh - 228px);
+		overflow:scroll;
+	}
+
+	.part_chapterlist_arrow{
+		position:absolute;
+		bottom:28px;
+		left: calc(50vw - 50px);
+		width: 40px;
+		height: 40px;
+		background-image:url("../../assets/images/triangle_white_shadow_down.svg");
+		background-size:cover;
+		background-repeat:no-repeat;
+		z-index:10;
+	}
+	.part_chapterlist_arrow_top{
+		transform:rotate(180deg);
+		left: calc(50vw + 20px);
+		bottom: 23px;
+	}
+
+	/* UNIT */
+
+
+
+	#unitoverview{
+		position: absolute;
+		height: 100%;
+		width: 100vw;
+		overflow:hidden;
+		top:0px;
+		left:0px;
+		z-index:10;
+	}
+
+	.unit_mobile_container{
+		position:absolute;
+		height:calc(100% - 30px);
+		width:100vw;
+		top:0px;
+		left:0px;
+		margin-top:28px;
+	}
+
+	.unit_mobile{
+		position: relative;
+		height:100%;
+		background:#F5F5F3;
+		z-index:-2000;
+		overflow-y: scroll;
+		overflow-x:hidden;
+	}
+
+	.unit_mobile_register{
+		position: relative;
+		width:100%;
+		height:16px;
+	}
+
+	.unit_mobile_register_line{
+		position: absolute;
+		width:100%;
+		margin-top:14px;
+		height:1px;
+		background:black;
+	}
+
+	.unit_mobile_register_part{
+		position: absolute;
+		left:4vw;
+		height:15px;
+		border:1px solid black;
+		border-bottom:none;
+		background:#F5F5F3;
+		text-transform: uppercase;
+		padding: 0px 4px;
+	}
+	.unit_mobile_register_chapter{
+		position: absolute;
+		left:42vw;
+		height:15px;
+		width: calc(50% + 1px);
+		border:1px solid black;
+		border-bottom:none;
+		background:#F5F5F3;
+		text-transform: uppercase;
+		padding-left:4px;
+	}
+
+	.unit_mobile_register_chapter_author{
+		font-size:12px;
+		margin-top:5px;
+	}
+
+	.unit_mobile_register_text{
+		line-height:18px;
+		font-size:12px;
+	}
+	
+	.unit_mobile_register_strut{
+		display: inline-block;
+		height:18px;
+	}
+
+	.unit_mobile_register_text_last{
+		font-size: 30px;
+		position: relative;
+		line-height: 34px;
+	}
+
+	.unit_mobile_register_line_last{
+		margin-top: 29px;
+	}
+
+	.unit_mobile_register_part_last{
+		height:30px;
+		padding-top: 16px;
+	}
+	
+	.unit_mobile_register_strut_last{
+		display: inline-block;
+		height:25px;
+	}
+
+	.part_mobile_register_last{
+		height:30px;
+		margin-bottom:20px;
+		padding-top: 0px;
+	}
+
+
+	.unit_mobile_register_pdf{
+		position: absolute;
+		right:0;
+		border-left:1px solid black;
+		font-family: CacheMono;
+		font-size:12px;
+		height:15px;
+		border-top: 1px solid black;
+		background: #F5F5F5;
+		padding: 0px 8px;
+	}
+	.unit_loader{
+		z-index: -2000;
+	}
+
+	/* UNIT ELEMENTS */
+
+	.unit_title{
+		font-size:30px;
+		margin-top: 20px;
+		margin-bottom: 10px;
+		line-height:30px;
+	}
+
+	.unit_mobile_element_full{
+		width:100%;
+	}
+
+	.unit_mobile_element_right{
+		width:75%;
+		margin-left:25%;
+	}
+
+	.unit_text_s{
+		font-size:12px;
+	}
+
+	:host ::ng-deep .unit_text_m{
+		font-size:14px;
+		line-height:18px;
+		overflow:hidden;
+	}
+	
+	:host ::ng-deep .unit_text_l{
+		font-size:18px;
+		line-height:22px;
+		overflow:hidden;
+	}
+
+	:host ::ng-deep .unit_text_l sup{
+		margin: -10px -15px;
+		padding: 10px 15px;
+	}
+	
+	.unit_text_xl{
+		font-size:22px;
+		line-height:26px;
+	}
+
+
+	.unit_title,
+	.unit_text_s,
+	:host ::ng-deep .unit_text_m,
+	:host ::ng-deep .unit_text_l,
+	.unit_text_xl,
+	.unit_video,
+	.unit_audio{
+		padding: 0px;
+		padding-left: calc(4vw + 6px);
+		padding-right: calc(4vw + 6px);
+		padding-bottom:15px;
+		width:100%;
+	}
+
+	.unit_media{
+		width: 100%;
+		padding-left: 0px;
+		padding-right: 0px;
+	}
+
+	.unit_image_placeholder{
+		margin:0;
+		margin-bottom:15px;
+		width: 100%;
+	}
+
+	.unit_image_loader_small{
+		width:100% !important;
+	}
+
+	.infobox_mobile{
+		margin-bottom: 10px;
+    	top: -8px;
+		margin-left: calc(4vw + 6px);
+		margin-right: calc(4vw + 6px);
+	}
+
+	.unit_mobile_space_bottom{
+		width:100%;
+		height:45px;
+		float:left;
+	}
+
+	.unit_mobile_arrow{
+		position: fixed;
+		top: calc(100% - 45px);
+		left: calc(4vw + 6px);
+		width:24px;
+		height:24px;
+		background-image:url("../../assets/images/triange_black_border_right.svg");
+		background-size:cover;
+		background-repeat:no-repeat;
+		z-index:10;
+		transform:rotate(180deg);
+	}
+
+	.unit_mobile_arrow_right{
+		left: calc(96vw - 27px);
+		transform:none;
+	}
+
+	.reference_number{
+		width:24px;
+		line-height: 16px;
+	}
+
+	.reference_text{
+		width: calc(100% - 24px);
+		line-height: 16px;
+	}
+
+	.unit_title_editorial{
+		width:100%;
+		height:40px;
+	}
+
+
+
+	.youtube_placeholder{
+		position: relative;
+		width: 100vw;
+		height: 56.4vw;
+		overflow: hidden;
+		padding: 0;
+		margin:0;
+		margin-bottom: 15px;
+	}
+
+	.unit_video{
+		padding:0;
+		width: 100vw;
+		height: 56.4vw;
+		margin-bottom:15px;
+	}
+
+}
+
+

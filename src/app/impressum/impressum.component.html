@@ -1,0 +1,180 @@
+
+    <!-- IMPRESSUM -->
+    <div *ngIf="frontendService.impressumLoaded&&frontendService.booklistLoaded" [@impressumAnimation]="impressumState" (@impressumAnimation.done)="impressumAnimationDone($event)" id="impressum">
+        <div id="back_to_book" *ngIf="!frontendService.mobileVersion&&frontendService.lastRouteBook"
+            (click)="frontendService.goBackIntoBook()">
+            <div id="back_to_book_triangle"></div>
+            {{frontendService.lastRouteBook}}
+        </div>
+        <div id="impressum_overview">
+            <div id="impressum_title">
+                <ng-container *ngIf="frontendService.language=='de'">Arbeitsspeicher für neue Denkkollektive</ng-container>
+                <ng-container *ngIf="frontendService.language=='en'">Arbeitsspeicher für neue Denkkollektive</ng-container>
+            </div>
+
+            <div id="impressum_logo" *ngIf="impressumAlreadyShown"></div>
+            <div id="impressum_changelanguage">
+                <div class="impressum_button_scale impressum_button_scale_no_margin impressum_changelanguage_button"
+                    [ngClass]="frontendService.language!='de'?'impressum_changelanguage_button_white':''" (click)="frontendService.language='de'">
+                    Deutsch
+                </div>
+                <div class="impressum_button_scale impressum_button_scale_no_margin impressum_changelanguage_button"
+                    [ngClass]="frontendService.language!='de'?'':'impressum_changelanguage_button_white'" (click)="frontendService.language='en'">
+                    English
+                </div>
+            </div>
+           
+
+            <div id="impressum_text" [innerHTML]="frontendService.impressum.impressum_text | sanitizeHtml" *ngIf="frontendService.language=='de'"></div>
+            <div id="impressum_text" [innerHTML]="frontendService.impressum.impressum_text_en | sanitizeHtml" *ngIf="frontendService.language=='en'"></div>
+            <div class="impressum_content">
+                    <div class="impressum_content_title">
+                        <ng-container *ngIf="frontendService.language=='de'">Ausgaben</ng-container>
+                        <ng-container *ngIf="frontendService.language=='en'">Issues</ng-container>
+                    </div>
+                    <div class="impressum_content_text" *ngFor="let book of frontendService.booklist;trackBy: trackByFn">
+                        <div>
+                            <span [innerHTML]="book.booksummary | sanitizeHtml"></span>
+                            <span class="impressum_arrow_small" (click)="openImpressumBook(book.bookid)" *ngIf="book.public==1">Impressum d. Ausgabe</span>
+                        </div>
+                        <div class="impressum_button_container" *ngIf="book.orderlink!=''" (click)="frontendService.openLink(book.orderlink)">
+                            <div class="impressum_button_scale">
+                                <ng-container *ngIf="frontendService.language=='de'">bestellen</ng-container>
+                                <ng-container *ngIf="frontendService.language=='en'">order</ng-container>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="impressum_content_title">
+                        <ng-container *ngIf="frontendService.language=='de'">Konzept und Entwicklung</ng-container>
+                        <ng-container *ngIf="frontendService.language=='en'">Concept and Development</ng-container>
+                    </div>
+                    <div class="impressum_content_text" [innerHTML]="frontendService.impressum.impressum_field1 | sanitizeHtml" *ngIf="frontendService.language=='de'"></div>
+                    <div class="impressum_content_text" [innerHTML]="frontendService.impressum.impressum_field1_en | sanitizeHtml" *ngIf="frontendService.language=='en'"></div>
+
+                    <div class="impressum_content_title">
+                        <ng-container *ngIf="frontendService.language=='de'">Schriften</ng-container>
+                        <ng-container *ngIf="frontendService.language=='en'">Fonts</ng-container>
+                    </div>
+                    <div class="impressum_content_text" [innerHTML]="frontendService.impressum.impressum_field2 | sanitizeHtml" *ngIf="frontendService.language=='de'"></div>
+                    <div class="impressum_content_text" [innerHTML]="frontendService.impressum.impressum_field2_en | sanitizeHtml" *ngIf="frontendService.language=='en'"></div>
+                
+                    <div class="impressum_content_title">
+                        <ng-container *ngIf="frontendService.language=='de'">Danke</ng-container>
+                        <ng-container *ngIf="frontendService.language=='en'">Thanks</ng-container>
+                    </div>
+                    <div class="impressum_content_text" [innerHTML]="frontendService.impressum.impressum_field3 | sanitizeHtml" *ngIf="frontendService.language=='de'"></div>
+                    <div class="impressum_content_text" [innerHTML]="frontendService.impressum.impressum_field3_en | sanitizeHtml" *ngIf="frontendService.language=='en'"></div>
+                    <img class="impressum_content_image" style="width:290px;" src="https://cache.ch/images/logo_snf.svg" />
+                    <img class="impressum_content_image" style="width:120px;" src="https://cache.ch/images/logo_eth.png" />
+                    <img class="impressum_content_image" style="width:220px;" src="https://cache.ch/images/logo_zhdk.png" />
+
+                    <div class="impressum_multicolumn_break"></div>
+                
+                    <div class="impressum_content_title">
+                        <ng-container *ngIf="frontendService.language=='de'">Kontakt</ng-container>
+                        <ng-container *ngIf="frontendService.language=='en'">Contact</ng-container>
+                    </div>
+                    <div class="impressum_content_text" [innerHTML]="frontendService.impressum.impressum_field4 | sanitizeHtml" *ngIf="frontendService.language=='de'"></div>
+                    <div class="impressum_content_text" [innerHTML]="frontendService.impressum.impressum_field4_en | sanitizeHtml" *ngIf="frontendService.language=='en'"></div>
+                    <div class="impressum_content_title">
+                        <ng-container *ngIf="frontendService.language=='de'">Urheberrechte</ng-container>
+                        <ng-container *ngIf="frontendService.language=='en'">Copyright</ng-container>
+                    </div>
+                    <div class="impressum_content_text" [innerHTML]="frontendService.impressum.impressum_field5 | sanitizeHtml" *ngIf="frontendService.language=='de'"></div>
+                    <div class="impressum_content_text" [innerHTML]="frontendService.impressum.impressum_field5_en | sanitizeHtml" *ngIf="frontendService.language=='en'"></div>
+                
+                    <p style="clear:both"></p>
+                </div>
+        </div>
+        <div *ngFor="let book of this.frontendService.booklist;trackBy: trackByFn">
+            <div class="impressum_book_header" [id]="'impressum_book_'+book.bookid">
+                <div class="impressum_book_line"></div>
+                <div class="impressum_book_title" [ngStyle]="{'padding-right': (book.public==1) ? '50px' : '15px'}" (click)="book.impressumShow=!book.impressumShow">
+                    <span class="impressum_book_title_text" >
+                        <div class="impressum_book_title_bookname">
+                            <span class="impressum_book_cache">cache</span>
+                            <span class="impressum_book_bookname"> 
+                                0{{book.bookorder}}:
+                            </span>
+                        </div>
+                        <span class="impressum_book_bookname"> 
+                            {{book.bookname}}
+                        </span>
+                        <p style="clear:both"></p>
+                        <span class="impressum_book_title_text_strut"></span>
+                    </span>
+                    <div *ngIf="!frontendService.mobileVersion&&book.public==1" class="cross impressum_book_cross" [@impressumCrossAnimation]="book.impressumShow&&book.public==1"></div>
+                    <div *ngIf="frontendService.mobileVersion" class="cross impressum_book_cross" [@impressumCrossMobileAnimation]="book.impressumShow&&book.public==1"></div>
+                </div>
+            </div>
+            <div class="impressum_book_body" *ngIf="book.public==1" [@impressumToggleAnimation]="book.impressumShow">
+                <div class="impressum_book_cover" *ngIf="book.orderlink!=''" [ngStyle]="{'background-image':'url(\'' + book.bookcover + '\')'}"></div>
+                <div class="impressum_book_sale" *ngIf="book.orderlink!=''">
+                    <div class="impressum_book_sale_mobile" [innerHTML]="book.booksale | sanitizeHtml"></div>
+                    <div class="impressum_buttoncontainer_mobile">
+                        <div class="impressum_button_container impressum_button_container_no_margin" *ngIf="book.public==1">
+                            <div class="impressum_button_scale impressum_button_scale_no_margin" (click)="frontendService.openLink(book.orderlink)">
+                                bestellen
+                            </div>
+                        </div>
+                        <div class="impressum_button_container impressum_button_container_last" style="margin-top:0" *ngIf="book.public==1" (click)="frontendService.openBook(book.bookid)">
+                            <div class="impressum_button_scale impressum_button_scale_no_margin ">
+                                <ng-container *ngIf="book.language=='DE'">Zur Ausgabeseite</ng-container>
+                                <ng-container *ngIf="book.language=='EN'">go to issue</ng-container>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="clear:both;"></p>
+                </div>
+                <div class="impressum_margin"></div>
+                <div class="impressum_content impressum_content_mobile">
+                    <div class="impressum_content_title">
+                        <ng-container *ngIf="book.language=='DE'">Impressum</ng-container>
+                        <ng-container *ngIf="book.language=='EN'">Imprint</ng-container>
+                    </div>
+                    <div class="impressum_content_text impressum_content_text_mobile" [innerHTML]="book.bookimpressum | sanitizeHtml"></div>
+
+                    <div class="impressum_content_title" [id]="'impressum_book_kollektiv_'+book.bookid">
+                        <ng-container *ngIf="book.language=='DE'">Autor*innenkollektiv</ng-container>
+                        <ng-container *ngIf="book.language=='EN'">Authors' collective</ng-container>
+                    </div>
+                    <div class="impressum_content_text impressum_content_text_mobile">
+                        <div *ngFor="let author of book.author;trackBy: trackByFn, let authorLast=last">
+                            <div [innerHTML]="author.authortext | sanitizeHtml"></div>
+                            <br *ngIf="!authorLast">
+                        </div>
+                    </div>
+                    <div class="impressum_content_title">
+                        <ng-container *ngIf="book.language=='DE'">Arbeitsteilung</ng-container>
+                        <ng-container *ngIf="book.language=='EN'">Contributions</ng-container>
+                    </div>
+                    <div class="impressum_content_text impressum_content_text_mobile">
+                        <div *ngFor="let author of book.author;trackBy: trackByFn">
+                            {{author.authorfirstname}} {{author.authorsurname}} -
+                            <span style="text-transform:uppercase" *ngFor="let chapter of author.chapter;trackBy: trackByFn; let chapterLast=last">
+                                <span *ngIf="chapter.chapterid==24">EDITORIAL</span>
+                                <span *ngIf="chapter.chapterid==0">EPILOG</span>
+                                <span *ngIf="chapter.chapterid!=24&&chapter.chapterid!=0">{{chapter.chaptername}}</span>
+                                {{chapterLast ? '' : ', '}}
+
+                            </span>
+                            <br/><br/>
+                        </div>
+                    </div>
+
+                    <ng-container *ngIf="book.thanks!=''">
+                        <div class="impressum_content_title">
+                            <ng-container *ngIf="book.language=='DE'">Dank</ng-container>
+                            <ng-container *ngIf="book.language=='EN'">Thanks</ng-container>
+                        </div>
+                        <div class="impressum_content_text impressum_content_text_mobile" [innerHTML]="book.thanks">
+                        </div>
+                    </ng-container>
+                    <p style="clear:both"></p>
+                </div>
+            </div>
+        </div>
+        <p class="impressum_bottom_firefox"></p>
+    </div>
+    <!-- IMRESSUM ENDE-->

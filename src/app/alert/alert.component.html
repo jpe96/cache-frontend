@@ -1,0 +1,13 @@
+<div *ngIf="alert">
+  <div class="alert_background"></div>
+  <div class="alert_popup">
+    <div class="list-group">
+        <li class="list-group-item list-group-item-danger" *ngIf="alert.type==1">error</li>
+        <li class="list-group-item list-group-item-success" *ngIf="alert.type==2">success</li>
+        <li class="list-group-item list-group-item-warning" *ngIf="alert.type==3">warning</li>
+        <li class="list-group-item"><div [innerHTML]="alert.message" class="alertMessage"></div><br>
+            <button type="button" class="btn btn-link" (click)="closeAlert()" style="float:right;">close</button>
+        </li>
+      </div>
+  </div>
+</div>

@@ -1,0 +1,121 @@
+
+<!-- materialarchiv -->
+    <div *ngIf="frontendService.booklistLoaded" [@materialarchivAnimation]="materialarchivState"
+        (@materialarchivAnimation.done)="materialarchivAnimationDone($event)" id="materialarchiv">
+        <div id="materialarchiv_content" [ngStyle]="{'filter': showPreview ? 'blur(10px)' : 'none'}">
+            <!-- <div id="materialarchiv_bar_left"></div> -->
+            <div id="materialarchiv_menu_left" *ngIf="showMaterialarchivMenu">
+                <!-- <div class="materialarchiv_menu_block">
+                    <div class="materialarchiv_menu_select" (click)="filterShowImages=!filterShowImages;getMaterialarchivData()">
+                        <div class="materialarchiv_menu_dot" [ngClass]="filterShowImages?'':'materialarchiv_menu_dot_empty'"></div>
+                        <div class="materialarchiv_menu_text">Images</div>
+                    </div>
+                    <div class="materialarchiv_menu_select" (click)="filterShowText=!filterShowText;getMaterialarchivData()">
+                        <div class="materialarchiv_menu_dot" [ngClass]="filterShowText?'':'materialarchiv_menu_dot_empty'"></div>
+                        <div class="materialarchiv_menu_text">Text</div>
+                    </div>
+                    <div class="materialarchiv_menu_select" (click)="filterShowVideos=!filterShowVideos;getMaterialarchivData()">
+                        <div class="materialarchiv_menu_dot" [ngClass]="filterShowVideos?'':'materialarchiv_menu_dot_empty'"></div>
+                        <div class="materialarchiv_menu_text">Videos</div>
+                    </div>
+                    <div class="materialarchiv_menu_select" (click)="filterShowAudio=!filterShowAudio;getMaterialarchivData()">
+                        <div class="materialarchiv_menu_dot" [ngClass]="filterShowAudio?'':'materialarchiv_menu_dot_empty'"></div>
+                        <div class="materialarchiv_menu_text">Audio</div>
+                    </div>
+                </div> -->
+
+                <div id="materialarchiv_menu_close" *ngIf="frontendService.mobileVersion" (click)="showMaterialarchivMenu = false"></div>
+                <div class="materialarchiv_menu_select" (click)="filterShowBookid=0;getMaterialarchivData()">
+                    <div class="materialarchiv_icon_menu materialarchiv_icon" [ngClass]="filterShowBookid==0?'materialarchiv_icon_menu_active':'materialarchiv_icon_menu_inactive'"></div>
+                    <div class="materialarchiv_menu_text">all issues</div>
+                </div>
+
+                <div *ngFor="let book of frontendService.booklist.slice().reverse(); let i = index" (click)="filterShowBookid=book.bookid;getMaterialarchivData()"
+                    class="materialarchiv_menu_select">
+                    <div class="materialarchiv_icon_menu materialarchiv_icon" [ngClass]="filterShowBookid==book.bookid?'materialarchiv_icon_menu_active':'materialarchiv_icon_menu_inactive'"></div>
+                    <div class="materialarchiv_menu_text">0{{i+1}} {{book.bookname}}</div>
+                </div>
+                
+                <div class="materialarchiv_menu_select" id="materialarchiv_menu_rotate" (click)="reshuffle()">
+                    <div class="materialarchiv_icon_menu materialarchiv_icon materialarchiv_icon_menu_reload" style="background-color:rgba(0,0,0,0);"
+                    id="materialarchiv_menu_rotate_icon"></div>
+                    <div class="materialarchiv_menu_text">shuffle</div>
+                </div>
+                    
+            </div>
+            <div id="materialarchiv_menu_icon" *ngIf="frontendService.mobileVersion&&!showMaterialarchivMenu" (click)="showMaterialarchivMenu = true"></div>
+
+            <div id="materialarchiv_close" class="cross" (click)="closeMaterialarchiv()"></div>
+
+            <div id="materialarchiv_footer" *ngIf="!frontendService.mobileVersion">
+                <div id="materialarchiv_zoom" class="materialarchiv_menu_text">
+                    <div class="materialarchiv_icon" (click)="zoomIn()">
+                        <div class="materialarchiv_icon_zoom materialarchiv_zoom_button_plus_active"[ngClass]="zoomStateIn?'':'materialarchiv_icon_zoom_hide'"></div>
+                        <div class="materialarchiv_icon_zoom materialarchiv_zoom_button_plus_inactive" [ngClass]="zoomStateIn?'materialarchiv_icon_zoom_hide':''"></div>
+                    </div>
+                    <div class="materialarchiv_zoom_text">Zoom</div>
+                    <div class="materialarchiv_icon " (click)="zoomOut()">
+                        <div class="materialarchiv_icon_zoom materialarchiv_zoom_button_minus_active" [ngClass]="zoomStateIn?'materialarchiv_icon_zoom_hide':''"></div>
+                        <div class="materialarchiv_icon_zoom materialarchiv_zoom_button_minus_inactive" [ngClass]="zoomStateIn?'':'materialarchiv_icon_zoom_hide'"></div>
+                    </div>
+                </div>
+                <div id="materialarchiv_route" [ngStyle]="{'opacity': carpetPreviewRouteShow ? 1 : 0}" [innerHTML]="carpetPreviewRoute"></div>
+            </div>
+
+            <div id="materialarchiv_carpet" *ngIf="materialarchivAlreadyShown" (scroll)="checkCarpetNumberOfElements()">
+                <div id="materialarchiv_carpet_inner">
+                    <div class="materialarchiv_carpet_column" *ngFor="let carpet_column of materialarchivDataSplit; let i_parent = index">
+                        <ng-container *ngFor="let data of carpet_column; let i = index">
+                            <div *ngIf="data.show" class="materialarchiv_carpet_element"
+                                (mouseover)="showCarpetPreviewRoute(data.route)"
+                                (mouseout)="hideCarpetPreviewRoute()" (click)="openPreview(data, i, i_parent)">
+                                <div *ngIf="data.datatype==1" class="materialarchiv_carpet_text"
+                                [innerHTML]="data.datatextpreview | sanitizeHtml"></div>
+                                <!-- [ngStyle]="{'-webkit-line-clamp':carpetTextNumberLines, 'height': carpetTextHeight + 'px'} -->
+                                <ng-container *ngIf="data.datatype==2">
+                                    <img class="materialarchiv_carpet_image" [src]="data.datalink"
+                                    [ngStyle]="{'opacity': data.loaded ? 1 : 0}" (load)="data.loaded=true">
+                                </ng-container>
+                                <div class="materialarchiv_carpet_video_container"
+                                    *ngIf="(data.datatype==4||data.datatype==6)&&data.show&&data.datareplacement_image_small!=''"
+                                    [ngStyle]="{'opacity': data.loaded ? 1 : 0}">
+                                    <img class="materialarchiv_carpet_video"
+                                    [src]="data.datareplacement_image_small" (load)="data.loaded=true">
+                                    <span class="materialarchiv_carpet_video_icon">▶</span>
+                                </div>
+                                <div class="materialarchiv_carpet_audio_container"
+                                    *ngIf="data.datatype==3&&data.show">
+                                    Audio
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="materialarchiv_preview" *ngIf="showPreview" [ngStyle]="{'opacity': elementPreviewData.loaded&&!elementPreviewData.transitioning ? 1 : 0}">
+            <div id="materialarchiv_preview_background" (click)="closePreview()"></div>
+            <div class="materialarchiv_preview_arrows" *ngIf="!(elementPreviewData.i==0&&elementPreviewData.i_parent==0)" id="materialarchiv_preview_arrow_left" (click)="changePreviewElement(-1)"></div>
+            <div class="materialarchiv_preview_arrows" id="materialarchiv_preview_arrow_right" (click)="changePreviewElement(+1)"></div>
+            <div id="materialarchiv_preview_element_container">
+                <div id="materialarchiv_preview_element" class="materialarchiv_preview_image" 
+                    [ngStyle]="{'background-image': 'url(\''+elementPreviewData.datalink+'\')'}" *ngIf="elementPreviewData.datatype==2">
+                        <img id="materialarchiv_preview_image_hidden" [src]="elementPreviewData.datalink" (load)="elementPreviewData.loaded=true;calculatePreviewElementHeight()">
+                </div>
+                <div id="materialarchiv_preview_element" *ngIf="elementPreviewData.datatype==1" class="materialarchiv_preview_text"
+                    [innerHTML]="elementPreviewData.datatext | sanitizeHtml">
+                </div>
+                <div id="materialarchiv_preview_source" [innerHTML]="elementPreviewData.datasource"
+                    *ngIf="elementPreviewData.datasource&&elementPreviewData.datasource!=''">
+                </div>
+                <div id="materialarchiv_preview_route">in: <span [innerHTML]="elementPreviewData.route"></span>
+                </div>
+            </div>
+            <div id="materialarchiv_preview_show_in_book" (click)="openElementPreviewInBook()">show in chapter</div>
+        </div>
+        <div id="materialarchiv_preview_close" *ngIf="showPreview" class="cross" (click)="closePreview()"></div>
+        <div id="materialarchiv_preview_loader" *ngIf="showPreviewLoader" [ngStyle]="{'opacity': showPreviewLoaderIcon ? 0.5 : 0}"></div>
+
+    </div>
+<!-- materialarchiv ENDE-->
+

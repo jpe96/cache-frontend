@@ -1,0 +1,94 @@
+<div id="header"  [@headerAnimation]="frontendService.headerState">
+    <div class="header_logo" (click)="frontendService.openDoorman()"></div>
+    <div *ngIf="frontendService.mobileVersion">
+        <div class="header_mobile" (click)="clickMenuMobile()">
+            menü
+        </div>
+    </div>
+    <div class="header_menu" *ngIf="!frontendService.mobileVersion||frontendService.headerState=='mobile_open'">
+            <div class="header_link header_link_first" (click)="frontendService.openSearch();clickMenuMobile()">
+                <div id="header_search"></div>
+            </div> 
+
+            <div class="header_link" (click)="frontendService.openImpressum();clickMenuMobile()">
+                <div class="header_circle" [ngStyle]="{'backgroundColor': frontendService.activeState=='impressum' ? 'black' : '#DADADA'}"></div>
+                <ng-container *ngIf="frontendService.language=='de'">impressum</ng-container>
+                <ng-container *ngIf="frontendService.language=='en'">imprint</ng-container>
+            </div>
+            <div class="header_link" (click)="frontendService.openAbout();clickMenuMobile()">
+                <div class="header_circle" [ngStyle]="{'backgroundColor': (frontendService.activeState=='about') ? 'black' : '#DADADA'}"></div>
+                about
+            </div>
+            <div class="header_link" (click)="frontendService.openMaterialarchiv();clickMenuMobile()">
+                <div class="header_circle" [ngStyle]="{'backgroundColor': frontendService.activeState=='materialarchiv' ? 'black' : '#DADADA'}"></div>
+                browse
+            </div>
+            <div class="header_link" (click)="frontendService.openBlog();clickMenuMobile()">
+                <div class="header_circle" [ngStyle]="{'backgroundColor': frontendService.activeState=='blog' ? 'black' : '#DADADA'}"></div>
+                blog
+            </div>
+            <p style="clear:booth"></p>
+    </div>
+</div>
+
+<div id="search" [@searchAnimation]="frontendService.showSearch" (@searchAnimation.done)="searchAnimationDone($event)">
+    <div id="search_content">
+        <div id="search_inputbox">
+            <div id="search_inputbox_text" *ngIf="searchText!=''">Treffer zu&nbsp;</div>
+            <div id="search_input_flex">
+                <input type="text" id="search_input" placeholder="Suche" [(ngModel)]="searchText" (keyup)="search()" ngDefaultControl/>
+            </div>
+        </div>
+        <div id="search_loader" *ngIf="searchLoading"></div>
+        <ng-container *ngIf="searchResults&&searchResults.search_title">
+            <div id="search_filter">
+                <div class="search_filter_box" (click)="searchFilterClick('all')" [ngClass]="{'search_filter_box_gray': !searchFilter.searchAll}">Alles</div>
+                <ng-container *ngFor="let book of frontendService.booklist">
+                    <div *ngIf="book.public==1" (click)="searchFilterClick(book.bookid)" class="search_filter_box" [ngClass]="{'search_filter_box_gray': (!(searchFilter.searchBook.indexOf(book.bookid)>-1)||searchFilter.searchAll)}" >
+                        {{book.bookname}}
+                    </div>
+                </ng-container>
+                <div class="search_filter_box" (click)="searchFilterClick('blog')" [ngClass]="{'search_filter_box_gray': (!(searchFilter.searchBook.indexOf('blog')>-1)||searchFilter.searchAll)}">Blog</div>
+                <p style="clear:both"></p>
+            </div>
+            <ng-container *ngFor="let result of searchResults.search_title;trackBy: trackByFn">
+                <div class="search_results_box" (click)="searchNavigateToElement(result)" *ngIf="searchFilter.searchAll">
+                    <div class="search_results_title">
+                        <div class="search_results_title_inner">
+                            {{result[result.length-1].name}}
+                        </div>
+                    </div>
+                    <div class="search_results_route">
+                        <span *ngFor="let route of result;trackBy: trackByFn; let index = index ">
+                            <ng-container *ngIf="index<(result.length-1)">{{route.name}}
+                                <ng-container *ngIf="index<(result.length-2)">/ </ng-container>
+                            </ng-container>
+                        </span>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngFor="let result of searchResults.search_text;trackBy: trackByFn">
+                <div class="search_results_box" (click)="searchNavigateToElement(result.route)" *ngIf="searchFilter.searchAll||searchFilter.searchBook.indexOf(result.route[0].id)>-1">
+                    <div class="search_results_title">
+                        <div class="search_results_title_inner">
+                            <span class="search_result_title_gray">{{result.textsearch[0][0].beforeChars}}</span>{{result.textsearch[0][0].searchChars}}<span class="search_result_title_gray">{{result.textsearch[0][0].afterChars}}</span>
+                        </div>
+                    </div>
+                    <div class="search_results_route">
+                        <span *ngFor="let route of result.route;trackBy: trackByFn; let index = index  ">
+                            <ng-container *ngIf="index<(result.route.length)&&index!=4"><span [innerHTML]="route.name"></span>
+                                <ng-container *ngIf="index<(result.route.length-1)&&index!=3">/ </ng-container>
+                            </ng-container>
+                        </span>
+                    </div>
+                </div>
+            </ng-container>
+            <div class="search_results_box" *ngIf="searchResults.search_title.length==0&&searchResults.search_text.length==0">
+                <div class="search_results_title">
+                    Keine Treffer zu der Suchanfrage.
+                </div>
+            </div>
+        </ng-container>
+        <p style="clear:both"></p>
+    </div>
+</div>

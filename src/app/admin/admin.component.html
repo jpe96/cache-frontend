@@ -1,0 +1,13 @@
+<div class="container-main">
+  <div class="container-header">
+    <app-header></app-header>
+  </div>
+  <div class="container-content">
+    <ng-container *ngIf="currentUser.permission==0||currentUser.permission==1">
+      <router-outlet></router-outlet>
+    </ng-container>
+    <div *ngIf="currentUser.permission!=0&&currentUser.permission!=1" id="no_access">
+      Du hast nur einen Viewer-Zugang und keine Berechtigung für das Backend.
+    </div>
+  </div>
+</div>

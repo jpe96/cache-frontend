@@ -1,0 +1,26 @@
+<div class="container-header-in">
+  <div class="container-title">
+      cache dashboard
+  </div>
+  <div class="container-user">
+    {{currentUser.username}}  
+    <span matTooltip="log out" (click)="logout()" style="cursor:pointer;">
+      <mat-icon>keyboard_tab</mat-icon>
+    </span>
+  </div>
+  <div class="container-nav" *ngIf="currentUser.permission==1">
+      <a class="link-nav" routerLink="/admin/content">Inhalt</a> /
+      <a class="link-nav" routerLink="/admin/content/replic">Repliken</a> /
+      <a class="link-nav" routerLink="/admin/blog">Blog</a> /
+      <a class="link-nav" routerLink="/admin/book">Ausgaben</a> /
+      <a class="link-nav" routerLink="/admin/info">Informationen</a> /
+      <a class="link-nav" routerLink="/admin/datenspeicherung">Datenspeicherung</a> /
+      <a class="link-nav" routerLink="/admin/user">User</a>
+  </div>
+  <div class="container-nav" *ngIf="currentUser.permission==0">
+    <a class="link-nav" routerLink="/admin/content">Inhalt</a> /
+    <a class="link-nav" routerLink="/admin/content/replic">Repliken</a> /
+    <a class="link-nav" routerLink="/admin/blog">Blog</a>
+  </div>
+
+</div>

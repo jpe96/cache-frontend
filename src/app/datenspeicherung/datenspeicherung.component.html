@@ -1,0 +1,98 @@
+<div class="content">
+  <ul class="list-group">
+    <li class="list-group-item list-header" (click)="showDatenspeicherung=!showDatenspeicherung">
+            <span>Migration</span>
+            <span *ngIf="showDatenspeicherung"><mat-icon>expand_more</mat-icon></span>
+            <span *ngIf="!showDatenspeicherung"><mat-icon>expand_less</mat-icon></span>
+    </li>
+    <li class="list-group-item" *ngIf="!showDatenspeicherung">
+      Wähle aus, ob du Kapitel oder Repliken exportieren möchtest. Bitte beachte, dass nur Einträge angezeigt werden, welche ein PDF hinterlegt haben.
+      <div class="distance"></div>
+      <div class="distance"></div>
+
+      <ul class="list-group" *ngIf="!showChapter" (click)="showChapter=true">
+        <li class="list-group-item list-header" style="cursor:pointer">
+          <div class="list_col">
+            Kapitel exportieren
+          </div>
+        </li>
+      </ul>
+      
+      <ng-container *ngIf="showChapter">
+        <div class="row" *ngIf="csvChapterlist">
+          <div class="col">
+            <ul class="list-group">
+              <li class="list-group-item list-header">
+                <div class="list_col">
+                  Kapitelname
+                </div>
+                <div class="list_col">
+                  Autoren
+                </div>
+                <div class="list_col">
+                  Buchtitel
+                </div>
+              </li>
+              <li class="list-group-item list-group-item-action" *ngFor="let chapter of csvChapterlist" [ngClass]="{'list_selected': chapter.selected}" (click)="chapter.selected=!chapter.selected">
+                <div class="list_col">
+                  {{chapter.kapitelname}}
+                </div>
+                <div class="list_col">
+                  {{chapter.autor}}
+                </div>
+                <div class="list_col">
+                  {{chapter.titel_des_buchs}}
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <button (click)="generateCSV('Chapter')">CSV-Datei der Kapitel erstellen</button>
+        <div class="distance"></div>
+        <div class="distance"></div>
+      </ng-container>
+
+      <ul class="list-group" *ngIf="!showReplica" (click)="showReplica=true">
+        <li class="list-group-item list-header" style="cursor:pointer">
+          <div class="list_col">
+            Repliken exportieren
+          </div>
+        </li>
+      </ul>
+
+      <ng-container *ngIf="showReplica">
+        <div class="row" *ngIf="csvRepliclist">
+          <div class="col">
+            <ul class="list-group">
+              <li class="list-group-item list-header">
+                <div class="list_col">
+                  Replikentitel
+                </div>
+                <div class="list_col">
+                  Autor
+                </div>
+                <div class="list_col">
+                  Replik auf Buch / Kapitel
+                </div>
+              </li>
+              <li class="list-group-item list-group-item-action" *ngFor="let replic of csvRepliclist" [ngClass]="{'list_selected': replic.selected}" (click)="replic.selected=!replic.selected">
+                <div class="list_col">
+                  {{replic.titel}}
+                </div>
+                <div class="list_col">
+                  {{replic.autor}}
+                </div>
+                <div class="list_col">
+                  {{replic.replik_auf}}
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <button (click)="generateCSV('Replic')">CSV-Datei der Repliken erstellen</button>
+      </ng-container>
+    </li>
+  </ul>
+</div>

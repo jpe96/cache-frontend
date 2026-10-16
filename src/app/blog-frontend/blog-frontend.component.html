@@ -1,0 +1,177 @@
+<!-- BLOG -->
+<div *ngIf="frontendService.blogLoaded&&frontendService.booklistLoaded" id="blog"  [@blogAnimation]="blogState" (@blogAnimation.done)="blogAnimationDone($event)">
+    <div id="back_to_book" *ngIf="!frontendService.mobileVersion&&frontendService.lastRouteBook"
+        (click)="frontendService.goBackIntoBook()">
+        <div id="back_to_book_triangle" style="margin-top:8px;"></div>
+        {{frontendService.lastRouteBook}}
+    </div>
+
+    <div id="blog_text" [innerHTML]="frontendService.blog.blog_text | sanitizeHtml"></div>
+    <div class="blog_taglist">
+        <div class="blog_taglist_tag" (click)="blogTagFilter=1;">Alle</div>
+        <div class="blog_taglist_tag" (click)="blogTagFilter=2">Replik</div>
+        <div class="blog_taglist_tag" (click)="blogTagFilter=tag.blog_tagid" *ngFor="let tag of frontendService.blog.blog_taglist">{{tag.blog_tagname}}</div>
+        <p style="clear:both"></p>
+    </div>
+    <div class="blog_taglist_hide_scrollbar" *ngIf="!frontendService.mobileVersion"></div>
+    <div id="blog_bloglist_container">
+        <div class="blog_bloglist_col" *ngFor="let i of [].constructor(3); let colIndex = index">
+            <ng-container *ngIf="!frontendService.mobileVersion||colIndex==0">
+                <ng-container *ngFor="let blog of frontendService.blog.bloglist | filter: filterBlogTag; let blogIndex = index">
+                    <div class="blog_bloglist_blog" *ngIf="frontendService.mobileVersion||(blogIndex) % 3 == (colIndex)" (click)="frontendService.openBlog(blog.blog_dataid)">
+                        <div class="blog_bloglist_taglist">
+                            <div class="blog_bloglist_taglist_tag" *ngIf="blog.blog_list[0].blog_listtype==10">
+                                <ng-container *ngIf="blog.blog_list[0].data[0].language=='DE'">Replik: </ng-container>
+                                <ng-container *ngIf="blog.blog_list[0].data[0].language=='EN'">Response: </ng-container>
+                            {{blog.blog_list[0].data[0].chaptername}}</div>
+                            <div class="blog_bloglist_taglist_tag" *ngFor="let tag of frontendService.blog.blog_taglist">{{tag.blog_tagname}}</div>
+                        </div>
+                        <div class="blog_bloglist_taglist_hide_scrollbar "></div>
+                        <div class="blog_bloglist_title" [ngClass]="blog.blog_list[0].blog_listtype==10?'blog_bloglist_title_replic':''">
+                            {{blog.blog_title}}
+                        </div>
+                        <div class="blog_bloglist_datum">
+                            <ng-container *ngIf="blog.blog_list[0].data[0].language!='EN'">{{blog.blog_date | customDate}}</ng-container>
+                            <ng-container *ngIf="blog.blog_list[0].data[0].language=='EN'">{{blog.blog_date | customDateEn}}</ng-container>
+                                {{blog.blog_author}}
+                        </div>
+                        <div class="blog_bloglist_leadtext" [innerHTML]="blog.blog_leadtext | sanitizeHtml">
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </div>
+        <p style="clear:both"></p>
+    </div>
+</div>
+
+<div *ngIf="frontendService.activeState=='blog'&&frontendService.activeBlog" class="blog_content_cross cross" (click)="frontendService.openBlog()" [@blogContentCrossAnimation]="blogContentState"></div>
+<div *ngIf="frontendService.activeState=='blog'&&frontendService.activeBlog" id="blog_content" [@blogContentAnimation]="blogContentState"  [ngClass]="frontendService.activeBlog.replic?'blog_content_replic':''" (click)="blogClick($event)" (@blogContentAnimation.done)="blogAnimationDone($event)">
+    <div id="blog_content_header">
+        <div id="blog_content_header_left"></div>
+        <div class="blog_content_header_tag" *ngIf="frontendService.activeBlog.replic">
+            <ng-container *ngIf="frontendService.activeBlog.blog_list[0].data[0].language=='DE'">Replik: </ng-container>
+            <ng-container *ngIf="frontendService.activeBlog.blog_list[0].data[0].language=='EN'">Response: </ng-container>
+        {{frontendService.activeBlog.blog_list[0].data[0].chaptername}} </div>
+        <div class="blog_content_header_tag" *ngFor="let tag of frontendService.activeBlog.blog_taglist">{{tag.blog_tagname}}</div>
+        <p style="clear:both"></p>
+    </div>
+    <div class="blog_content_heroimage_placeholder" *ngIf="frontendService.activeBlog.blog_heroimage!=''" [ngStyle]="{height: frontendService.windowWidth*(frontendService.activeBlog.blog_heroimageHeight/frontendService.activeBlog.blog_heroimageWidth) + 'px'}">
+        <div class="unit_image_loader"></div>
+        <img [src]="frontendService.activeBlog.blog_heroimage" [@imageAnimation]="frontendService.activeBlog.heroimageState" (load)="frontendService.activeBlog.heroimageState='show'" class="blog_content_heroimage">
+    </div>
+    <div id="blog_content_title" [ngClass]="frontendService.activeBlog.replic?'blog_content_title_replic':''">
+        <span *ngIf="frontendService.activeBlog.replic">{{frontendService.activeBlog.blog_list[0].data[0].replicheadline}}</span>
+        <span *ngIf="!frontendService.activeBlog.replic">{{frontendService.activeBlog.blog_title}}</span>
+    </div>
+
+    <div id="blog_content_information">
+        <div class="blog_content_information_box">
+            <ng-container *ngIf="frontendService.activeBlog.blog_list[0].data[0].language!='EN'">{{frontendService.activeBlog.blog_date | customDate}}</ng-container>
+            <ng-container *ngIf="frontendService.activeBlog.blog_list[0].data[0].language=='EN'">{{frontendService.activeBlog.blog_date | customDateEn}}</ng-container>
+        </div>
+        <div class="blog_content_information_box">
+            <span *ngIf="frontendService.activeBlog.replic">{{frontendService.activeBlog.blog_list[0].data[0].replicauthor}}</span>
+            <span *ngIf="!frontendService.activeBlog.replic">{{frontendService.activeBlog.blog_author}}</span>
+        </div>
+        <ng-container *ngIf="frontendService.activeBlog.replic">
+            <div class="blog_content_information_box_replic_container">
+                <div class="blog_content_information_box blog_content_information_box_chapter blog_content_information_box_replic" (click)="frontendService.openLink('https://cache.ch/'+frontendService.activeBlog.blog_list[0].data[0].bookid+'/'+frontendService.activeBlog.blog_list[0].data[0].partid+'/'+frontendService.activeBlog.blog_list[0].data[0].chapterid)">
+                    {{frontendService.activeBlog.blog_list[0].data[0].chaptername}}
+                </div>
+                <div *ngIf="frontendService.activeBlog.blog_list[0].data[0].replicpdf!=''||1" class="blog_content_information_box blog_content_information_box_replic blog_content_information_box_replic_pdf" (click)="frontendService.openLink(frontendService.activeBlog.blog_list[0].data[0].replicpdf)">
+                    PDF
+                </div>
+            </div>
+        </ng-container>
+        <p style="clear:both"></p>
+    </div>
+    <div *ngIf="frontendService.activeBlog.replic" class="blog_content_text" [innerHTML]="frontendService.activeBlog.blog_list[0].data[0].replictext | sanitizeHtml"></div>
+    <ng-container *ngIf="!frontendService.activeBlog.replic">
+        <ng-container *ngFor="let blog_list of frontendService.activeBlog.blog_list;let listIndex = index">
+            <div *ngIf="blog_list.blog_listtype==1" class="blog_content_text" [innerHTML]="blog_list.data[0].blog_texttext | sanitizeHtml"></div>
+
+            <ng-container *ngIf="blog_list.blog_listtype==4">
+                <div class="blog_content_media">
+                    <ng-container *ngIf="blog_list.data[0].blog_mediatype==6">
+                        <div *ngIf="frontendService.checkYoutube(blog_list.data[0].blog_medialink)">
+                            <div class="blog_content_video blog_content_video_youtube" *ngIf="!blog_list.medialink_youtube" (click)="blog_list.medialink_youtube=true">
+                                <img [src]="frontendService.replaceYoutubeEmbedImage(blog_list.data[0].blog_medialink)">
+                                <span>▶</span>
+                            </div>
+                            <div *ngIf="blog_list.medialink_youtube">
+                                <iframe [src]="frontendService.replaceYoutubeEmbed(blog_list.data[0].blog_medialink) | safePipe" frameborder="0" allowfullscreen class="blog_content_video blog_content_video_youtube"></iframe>
+                            </div>
+                        </div>
+                        <div *ngIf="!frontendService.checkYoutube(blog_list.data[0].blog_medialink)" class="blog_content_video_vimeo_container">
+                            <iframe [src]="frontendService.replaceYoutubeEmbed(blog_list.data[0].blog_medialink) | safePipe" frameborder="0" allowfullscreen class="blog_content_video blog_content_video_youtube"></iframe>
+                        </div>
+                    </ng-container>
+                    <audio *ngIf="blog_list.data[0].blog_mediatype==3" id="audio_with_controls" controls src="{{blog_list.data[0].blog_medialink}}" type="audio/mp3" class="blog_content_audio">
+                        Dein Browser ist nicht in der Lage dieses Audio-File abzuspielen.
+                    </audio>
+                    <video *ngIf="blog_list.data[0].blog_mediatype==4" controls src="{{blog_list.data[0].blog_medialink}}" class="blog_content_audio">
+                        Dein Browser ist nicht in der Lage dieses Audio-File abzuspielen.
+                    </video>
+                </div>
+                <div class="blog_content_source" *ngIf="blog_list.data[0].blog_mediasource!=''" [innerHTML]="blog_list.data[0].blog_mediasource | sanitizeHtml">
+                </div>
+            </ng-container>
+
+            <!-- IMAGE CAROUSEL OR 1 IMAGE -->
+
+            <ng-container *ngIf="blog_list.blog_listtype==2||blog_list.blog_listtype==3">
+                <ng-container *ngIf="blog_list.data.length==1">
+                    <div *ngIf="blog_list.blog_listtype==2" class="blog_content_image_big_placeholder" [ngStyle]="{height: frontendService.windowWidth*(blog_list.data[0].blog_imageHeight/blog_list.data[0].blog_imageWidth) + 'px'}">
+                        <div class="unit_image_loader"></div>
+                        <img [src]="blog_list.data[0].blog_imagelink" [@imageAnimation]="blog_list.data[0].imageState" (load)="blog_list.data[0].imageState='show'" class="blog_content_image_big">
+                    </div>
+
+                    <div *ngIf="blog_list.blog_listtype==3" class="blog_content_image_small_placeholder" [ngStyle]="{height: 780*(blog_list.data[0].blog_imageHeight/blog_list.data[0].blog_imageWidth) + 'px'}">
+                        <div class="unit_image_loader unit_image_loader_small"></div>
+                        <img [src]="blog_list.data[0].blog_imagelink" [@imageAnimation]="blog_list.data[0].imageState" (load)="blog_list.data[0].imageState='show'" class="blog_content_image_small">
+                    </div>
+                    <div class=
+                    "blog_content_source" *ngIf="blog_list.data[0].blog_imagesource!=''" [innerHTML]="blog_list.data[0].blog_imagesource | sanitizeHtml">
+                    </div>
+                </ng-container>
+
+                <ng-container *ngIf="blog_list.data.length>1">
+                    <div [ngClass]="blog_list.blog_listtype==2?'blog_content_carousel blog_content_carousel_big':'blog_content_carousel blog_content_carousel_small'">
+                        <div class="blog_content_carousel_swipe_left" (click)="blogCarouselImage(listIndex, blogCarouselImageCheckNumber(blog_list.blogContentCarouselNumber)-1);"></div>
+                        <div class="blog_content_carousel_swipe_right" (click)="blogCarouselImage(listIndex, blogCarouselImageCheckNumber(blog_list.blogContentCarouselNumber)+1);"></div>
+                        <div class="blog_content_carousel_inner_container">
+                            <div class="blog_content_carousel_inner" [@blogContentCarouselAnimation]="{value:blog_list.blogContentCarouselState,params:{blogContentCarouselNumber:blog_list.blogContentCarouselNumber}}">
+                                <div class="blog_content_carousel_image" *ngFor="let image of blog_list.data">
+                                    <div class="unit_image_loader"></div>
+                                    <div class="blog_content_carousel_image_placeholder" [ngStyle]="{'background-image':' url(\'' + image.blog_imagelink + '\')'}" [@imageAnimation]="image.imageState"></div>
+                                    <img style="display:none" [src]="image.blog_imagelink" (load)="image.imageState='show'">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="blog_content_carousel_circle_container">
+                            <div [ngClass]="circleIndex==blogCarouselImageCheckNumber(blog_list.blogContentCarouselNumber)?'blog_content_carousel_circle blog_content_carousel_circle_full':'blog_content_carousel_circle'" *ngFor="let circle of blog_list.data; let circleIndex = index" (click)="blogCarouselImage(listIndex, circleIndex)"></div>
+                        </div>
+                    </div>
+                    <ng-container  *ngFor="let source of blog_list.data; let sourceIndex = index">
+                        <div [hidden]="!(sourceIndex==blogCarouselImageCheckNumber(blog_list.blogContentCarouselNumber))" class="blog_content_source" [innerHTML]="source.blog_imagesource | sanitizeHtml">
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+    <div id="blog_content_reference" *ngIf="frontendService.activeBlog.referencelist&&frontendService.activeBlog.referencelist.length!=0">
+        <div id="blog_content_reference_title">
+            <ng-container *ngIf="frontendService.activeBlog.language=='DE'">Anmerkungen</ng-container>
+            <ng-container *ngIf="frontendService.activeBlog.language=='EN'">Notes</ng-container>
+        </div>
+        <div *ngFor="let reference of frontendService.activeBlog.referencelist;trackBy: trackByFn; let index = index">
+            <div class="blog_content_reference_number">{{(index+1)}}</div>
+            <div class="blog_content_reference_text" [innerHTML]="reference.referencetext | sanitizeHtml"></div>
+        </div>
+        <p style="clear:both"></p>
+    </div>
+    <div id="blog_content_bottom"></div>
+</div>
+<!-- BLOG ENDE-->

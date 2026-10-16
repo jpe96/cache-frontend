@@ -1,0 +1,93 @@
+
+#about{
+	margin-top:45px;
+	position:absolute;
+	width:100vw;
+	height:calc(100vh - 45px);
+	box-shadow: 5px 5px 5px rgba(0,0,0,0.3);
+    z-index: 80;
+    background: white;
+    overflow-y: scroll;
+	overflow-x: hidden;
+	padding-bottom:40px;
+	font-size:17px;
+	line-height:21px;
+}
+
+#about_text{
+	width:940px;
+	font-size:24px;
+	line-height:30px;
+	margin-bottom:50px;
+	margin-left:calc(50vw - 470px);
+	margin-right:calc(50vw - 470px);
+}
+
+.address{
+	cursor:pointer;
+	font-size:14px;
+	font-style: normal;
+	padding-left:11px;
+    background-image:url("../../assets/images/triangle.svg");
+    background-size: 8.5px;
+	background-position: 0px 5px;
+    background-repeat:no-repeat;
+    hyphens: none;
+	margin-top: 12px;
+	line-height: 19px;
+}
+
+#about_title{
+	width:100%;
+	font-size:32px;
+	line-height:38px;
+	margin:20px 0;
+}
+
+#about_changelanguage{
+	width: 100%;
+	height: 46px;
+}
+
+.about_changelanguage_button{
+	margin-right: 20px;
+	background: white;
+}
+
+.about_changelanguage_button_white{
+	border-color:white !important
+}
+
+.about_button_scale{
+	padding-top:8px;
+	padding-right:10px;
+	border-top:1px black solid;
+	border-right:1px black solid;
+	line-height:13px;
+	font-family:CacheMono;
+	font-size:16px;
+	float:left;
+	margin-top:7.5px;
+	transition: all .2s ease-in-out;
+	transform-origin: left;
+	cursor:pointer;
+}
+
+.about_button_scale:hover{
+	transform:scale(1.5);
+}
+
+.about_button_scale_no_margin,
+.about_button_container_no_margin{
+	margin-top:0px;
+}
+
+@media only screen and (max-width: 1080px) {
+	#about_text{
+		width: 90vw;
+		font-size: 18px;
+		line-height: 26px;
+		margin-bottom: 50px;
+		margin-left: 5vw;
+	}
+}

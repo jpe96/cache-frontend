@@ -1,0 +1,1582 @@
+<div class="data-loading" >
+    <svg class="dataspinner" viewBox="25 25 50 50" *ngIf="!bookList" [@fade]>
+        <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+    </svg>
+</div>
+
+<div *ngIf="bookList" [@fade]="bookList ? 'show': 'hide'">
+
+<div *ngIf="contentCheckDisplay" class="saveAlert" [@fade]>
+    <strong>Achtung: </strong>
+        Nicht gespeicherte Daten werden gel&ouml;scht. Trotzdem weiterfahren?
+        <a (click)="savedContentCheckYes()">Ja</a> |
+        <a (click)="savedContentCheckNo()">Nein</a>
+</div>
+
+<div *ngIf="loading>0" class="loadingContainer">
+    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+</div>
+ 
+<!-- Replic Mode -->
+<div *ngIf="menuReplic" class="container-content">
+    <ul class="list-group" >
+        <li class="list-group-item list-header">
+            <div class="dataListElementIcons" *ngIf="replicSelectedBook!=0">
+                <span (click)="addReplic()" class="cursor">Replik hinzuf&uuml;gen</span>
+            </div>
+            <div class="form-floating">
+                <select class="form-select" (change)="selectBook(replicSelectedBook,false)"
+                id="replicSelectedBook" [(ngModel)]="replicSelectedBook"
+                style="width: auto; border: 0px; margin-top: -17px; margin-left: -17px;">
+                    <option value="0" selected *ngIf="replicSelectedBook==0">Ausgabe wählen</option>
+                    <option *ngFor="let book of bookList" [(ngValue)]="book.bookid">{{book.bookname}}</option>
+                </select>
+                <label style="margin-left: -14px;" for="replicSelectedBook">Repliken zur Ausgabe:</label>
+            </div>
+
+        </li>
+        <div>
+            <li class="list-group-item" *ngIf="replicSelectedBook==0">
+                Wähle zuerst eine Ausgabe aus.
+            </li>
+            <ng-container *ngIf="replicSelectedBook!=0">
+                <li class="list-group-item" *ngIf="replic.length==0">
+                    Für diese Ausgabe exisitert noch keine Replik.
+                </li>
+                <li class="list-group-item" *ngFor="let replic of replic; let replicIndex = index">
+                        <div class="dataListElement">
+                            <div class="dataListElementText" (click)="replic.showEditReplica=!replic.showEditReplica">
+                                <span *ngIf="replic.replicheadline.length">{{replic.replicheadline}}</span>
+                                <span *ngIf="!replic.replicheadline.length">Leere Replik</span>
+                            </div>
+                            <div class="dataListElementIcons">
+                                <span matTooltip="Vorschau des Elements in der Print-Version" *ngIf="replic.partid!=-1" (click)="saveReplic(replic, true);">
+                                    <mat-icon class="mat-icon-scaledown">portrait</mat-icon>
+                                </span>
+                            </div>
+                        </div>
+                        <div *ngIf="replic.showEditReplica" class="bloglistElementContainer" [@toggle]>
+
+                            <div class="form-floating mb-3">
+                                <input type="input" class="form-control" [(ngModel)]="replic.replicheadline" id="replicheadline">
+                                <label for="replicheadline">Headline</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="input" class="form-control" [(ngModel)]="replic.replicauthor" id="replicauthor">
+                                <label for="replicauthor">Autoren</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="input" class="form-control" [(ngModel)]="replic.replicheadline" id="replicheadline">
+                                <label for="replicheadline">Headline</label>
+                            </div>
+
+                            <div class="container-fluid" style="padding:0px;margin-bottom:15px;">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                                    
+                                        <div class="form-floating">
+                                            <select class="form-select" id="partid" [(ngModel)]="replic.partid"
+                                            (change)="getChapterReplic(replic.partid, replic.replicid)">
+                                            <option value="-1" selected *ngIf="replic.partid==-1">Part w&auml;hlen</option>
+                                            <option *ngFor="let part of partList" [(ngValue)]="part.partid">{{part.partname}}</option>
+                                            </select>
+                                            <label for="partid">Part</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-floating">
+                                            <select class="form-select" id="chapterid" [(ngModel)]="replic.chapterid">
+                                                <option value="-1" selected *ngIf="replic.chapterid==-1">Kapitel w&auml;hlen</option>
+                                                <option *ngFor="let chapter of replic.chapterlist" [(ngValue)]="chapter.chapterid">{{chapter.chaptername}}</option>
+                                            </select>
+                                            <label for="chapterid">Kapitel</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <jodit-editor [(ngModel)]="replic.replictext" (onClick)="insertReference($event, replic, 'replic', 'replictext');replic.insertReference=false;" (onBlur)="replic.replictext=textReplaceTagsRegex(replic.replictext); getDataNumbersOfReference('replic');"
+                            [config]="jodit_config_replic"></jodit-editor>
+                            <div class="distance"></div>
+
+                            <div *ngIf="(replic.replicreference.length-replic.removedReferences)>replic.numbersOfReference" class="warning" [@fade]>
+                                Es sind mehr Referenzen eingetragen, als im Text sind. Bitte l&ouml;sche alle ungenutzen Referenzen.
+                            </div>
+                                
+                                    <div class="list_container" [ngClass]="{'list_text_autoheight': reference.height}" *ngFor="let reference of replic.replicreference" [ngStyle]="{'opacity':reference.isDeleted ? '0.4' : '1' }">
+                                        <div class="list_field" style="height:auto;">
+                                            <span *ngIf="!reference.isDeleted">{{reference.referenceposition}}</span>
+                                            <span *ngIf="reference.isDeleted">X</span>
+                                        </div>
+                                            <div class="list_text">
+                                                <div class="list_text_inner" [ngClass]="{'list_text_inner_autoheight': reference.height}">
+                                                    <jodit-editor (click)="reference.height=true;" (onBlur)="reference.height=false;reference.referencetext=checkReferenceTextBlur(reference.referencetext)" [(ngModel)]="reference.referencetext" [disabled]="reference.isDeleted"
+                                                    [config]="jodit_config_reference"></jodit-editor>
+                                                </div>
+                                            </div>
+                                        <div class="list_field" style="height:auto;">
+                                            <mat-icon class="list_icon" (click)="reference.isDeleted=true;removeReference(replic.replicid,reference.referenceposition, 'replic')"  matTooltip="delete reference">delete</mat-icon>
+                                        </div>
+                                    </div>
+                                    <div class="list_container" style="height:auto;">
+                                        <div class="list_field">
+                                            <mat-icon class="list_icon">add</mat-icon>
+                                        </div>
+                                        <div class="list_text list_text_add" (click)="replic.insertReference=true;">
+                                            <span *ngIf="!replic.insertReference">Klicke hier um eine neue Referenz einzutragen.</span>
+                                            <span *ngIf="replic.insertReference">Klicke nun im Text an die Stelle, an welcher du die Referenz eintragen möchtest.</span>
+                                        </div>
+                                    </div>
+                                
+
+                            <button type="submit" class="btn btn-success" (click)="saveReplic(replic);">Replik speichern</button>
+                            <button type="submit" class="btn btn-danger" (click)="replic.showDelete=true">Replik l&ouml;schen</button>
+                            <button type="submit" class="btn btn-primary" (click)="openAddress()">Verweis hinzuf&uuml;gen</button>
+                            <div *ngIf="replic.showDelete" class="error" [@fade]="replic.showDelete ? 'show': 'hide'">
+                                Bist du sicher?
+                                <a (click)="deleteReplic(replic);replic.contentCheckText=false">Ja</a> | 
+                                <a (click)="replic.showDelete=false">Nein</a>
+                            </div>
+                            <hr>
+
+                                Hier kannst du das fertige Repliken-PDF f&uuml;r die Webseite hochladen oder l&ouml;schen. Diese werden später, falls sie als Blog veröffentlicht werden, verlinkt.
+                                <div class="distance"></div>
+
+                                <input #pdfUpload type="file" accept='application/pdf' (change)="uploadPDF(pdfUpload.files, replic, 'replic')" style="display:none;"/>
+                                <div class="error" *ngIf="replic.uploadPDFError">Dies ist keine g&uuml;ltige Datei. Bitte w&auml;hle eine andere.</div>
+                                <div *ngIf="replic.uploadPDFRun">
+                                    Datei wird hochgeladen...
+                                    <div class="progress_bar">
+                                        <div [style.width.%]="replic.uploadPdfState.message" class="progress_bar_loader">
+                                            <div class="progress_bar_percent">{{replic.uploadPdfState.message}} %</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="distance"></div>
+                                <button *ngIf="!replic.replicpdf" type="submit" class="btn btn-success" (click)="pdfUpload.file=false;pdfUpload.click()">PDF hochladen</button>
+
+                                <div *ngIf="replic.replicpdf&&replic.replicpdf!=''">
+                                    <a href="{{replic.replicpdf}}" target="_blank">{{replic.replicpdf}}</a>
+                                    <div class="distance"></div>
+                                    <div class="distance"></div>
+                                    <button type="submit" class="btn btn-danger" (click)="replic.deleteReplicPDFShow=true">PDF l&ouml;schen</button>
+                                    <div *ngIf="replic.deleteReplicPDFShow" class="error" [@fade]>
+                                        Achtung: Du m&ouml;chtest das PDF zu der Replik <u>{{replic.replicheadline}}</u> löschen.
+                                        Bist du sicher?
+                                        <a (click)="deleteReplicPDF(replicIndex);">Ja</a> | 
+                                        <a (click)="replic.deleteReplicPDFShow=false">Nein</a>
+                                    </div>
+                                </div>
+                        </div>
+                </li>
+            </ng-container>
+        </div>
+    </ul>
+</div>
+
+<!-- No Replic Mode -->
+<div *ngIf="!menuReplic" [ngClass]="workMode?'container-content-work':'container-content'">
+
+    <ul class="list-group">
+        <li class="list-group-item list-header">
+                <span (click)="showSelect=!showSelect">Inhalt ausw&auml;hlen </span>
+                <span *ngIf="showSelect"><mat-icon>expand_more</mat-icon></span>
+                <span *ngIf="!showSelect"><mat-icon>expand_less</mat-icon></span>
+                <span style="float:right;cursor:pointer;margin-top:-2px;">
+                    <span *ngIf="!workMode" matTooltip="Buchvorschau" style="margin-right:5px;" (click)="showPDFPreviewSettings()">
+                        <mat-icon>book</mat-icon>
+                    </span>
+                    <span matTooltip="Split-Anzeige" (click)="workModeChange()">
+                        <mat-icon>vertical_split</mat-icon>
+                    </span>
+                </span>
+                
+        </li>
+        <li class="list-group-item" *ngIf="showSelect" [@toggle]>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <ul class="list-group list-group_no_margin">
+                            <li class="list-group-item list-header">
+                                Ausgabe
+                            </li>
+                            <div id="booklist">
+                                <li [ngClass]="{'list-group-item-primary': book.status}" class="list-group-item list-group-item-action" style="cursor:pointer;" *ngFor="let book of bookList" (click)="savedContentCheck('selectBook',book.bookid)">{{book.bookname}}</li>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group" *ngIf="partList" [@fade]>
+                        <ul class="list-group list-group_no_margin">
+                            <li class="list-group-item list-header">
+                                Part
+                                <div *ngIf="chapterList&&partList.length>1" style="float:right;cursor:pointer;">
+                                    <span matTooltip="Position nach oben" [matTooltipDisabled]="activepart.partposition == 0" (click)="changePosition('part', activepart.partposition,-1,activepart.partid)" [ngStyle]="{'color':activepart.partposition == 0 ? '#CCC' : 'black' }">
+                                        <mat-icon>keyboard_arrow_up</mat-icon>
+                                    </span>
+                                    <span matTooltip="Position nach unten" [matTooltipDisabled]="activepart.partposition == (partList.length-1)" (click)="changePosition('part', activepart.partposition,1,activepart.partid)" [ngStyle]="{'color':activepart.partposition == (partList.length-1) ? '#CCC' : 'black' }">
+                                        <mat-icon>keyboard_arrow_down</mat-icon>
+                                    </span>
+                                </div>
+                            </li>
+                            <div id="partlist">
+                                <li [ngClass]="{'list-group-item-primary': part.status}" class="list-group-item list-group-item-action" *ngFor="let part of partList" (click)="savedContentCheck('selectPart',part.partid)" (mouseenter)="part.mouseover=true" (mouseleave)="part.mouseover=false">
+                                    <div class="listText">
+                                        {{part.partname}}
+                                    </div>
+                                    <div *ngIf="part.mouseover" class="listIcons">
+                                        <ng-container *ngIf="partList.length>1">
+                                            <span matTooltip="Position nach oben" [matTooltipDisabled]="part.partposition == 0" (click)="changePosition('part', part.partposition,-1,part.partid);$event.stopPropagation()" [ngStyle]="{'color':part.partposition == 0 ? '#CCC' : 'black' }">
+                                                <mat-icon>keyboard_arrow_up</mat-icon>
+                                            </span>
+                                            <span matTooltip="Position nach unten" [matTooltipDisabled]="part.partposition == (partList.length-1)" (click)="changePosition('part', part.partposition,1,part.partid);$event.stopPropagation()" [ngStyle]="{'color':part.partposition == (partList.length-1) ? '#CCC' : 'black' }">
+                                                <mat-icon>keyboard_arrow_down</mat-icon>
+                                            </span>
+                                        </ng-container>
+                                    </div></li>
+                                <li class="list-group-item list-group-add list-group-item-action" (click)="addPart()"><b>Part hinzuf&uuml;gen</b></li>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+                <div class="show_epilog_information" *ngIf="showEditorialInformation">
+                    Das Editorial besitzt keine Kapitel, es wird lediglich der Text angezeigt, welcher unten angepasst werden kann.
+                </div>
+                
+                <div class="col">
+                    <div class="form-group" *ngIf="chapterList" [@fade]>
+                        <ul class="list-group list-group_no_margin">
+                            <li class="list-group-item list-header">
+                                Kapitel
+                            </li>
+                            <div id="chapterlist">
+                                <li [ngClass]="{'list-group-item-primary': chapter.status}" class="list-group-item list-group-item-action" *ngFor="let chapter of chapterList" (click)="savedContentCheck('selectChapter',chapter.chapterid)" (mouseenter)="chapter.mouseover=true" (mouseleave)="chapter.mouseover=false">
+                                    <div class="listText">
+                                        {{chapter.chaptername}}
+                                    </div>
+                                    <div *ngIf="chapter.mouseover" class="listIcons">
+
+                                        <span matTooltip="Kapitel verschieben" (click)="openMoveElement(chapter.chapterid, 'part');$event.stopPropagation()">
+                                            <mat-icon class="mat-icon-scaledown">input</mat-icon>
+                                        </span>
+                                        <span *ngIf="chapter.chapterlocked==0" matTooltip="Kapitel sperren" (click)="lockChapter(chapter.chapterid, 1);$event.stopPropagation()">
+                                            <mat-icon class="mat-icon-scaledown">lock_open</mat-icon>
+                                        </span>
+                                        <span *ngIf="chapter.chapterlocked==1" matTooltip="Kapitel entsperren" (click)="lockChapter(chapter.chapterid, 0);$event.stopPropagation()">
+                                            <mat-icon class="mat-icon-scaledown">lock</mat-icon>
+                                        </span>
+                                        <ng-container *ngIf="chapterList.length>1">
+                                            <span matTooltip="Position nach oben" [matTooltipDisabled]="chapter.chapterposition == 0" (click)="changePosition('chapter', chapter.chapterposition,-1,chapter.chapterid);$event.stopPropagation()" [ngStyle]="{'color':chapter.chapterposition == 0 ? '#CCC' : 'black' }">
+                                                <mat-icon>keyboard_arrow_up</mat-icon>
+                                            </span>
+                                            <span matTooltip="Position nach unten" [matTooltipDisabled]="chapter.chapterposition == (chapterList.length-1)" (click)="changePosition('chapter', chapter.chapterposition,1,chapter.chapterid);$event.stopPropagation()" [ngStyle]="{'color':chapter.chapterposition == (chapterList.length-1) ? '#CCC' : 'black' }">
+                                                <mat-icon>keyboard_arrow_down</mat-icon>
+                                            </span>
+                                        </ng-container>
+                                    </div>
+                                </li>
+                                <li class="list-group-item list-group-add list-group-item-action" (click)="addChapter()"><b>Kapitel hinzuf&uuml;gen</b></li>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group" *ngIf="unitList&&!showEditorialInformation" [@fade]>
+                        <ul class="list-group list-group_no_margin">
+                            <li class="list-group-item list-header">
+                                Unit
+                            </li>
+                            <div id="unitlist">
+                                <li [ngClass]="{'list-group-item-primary': unit.status}" class="list-group-item list-group-item-action" *ngFor="let unit of unitList" (click)="savedContentCheck('selectUnit',unit.unitid)" (mouseenter)="unit.mouseover=true" (mouseleave)="unit.mouseover=false">
+                                    <div class="listText">
+                                        {{unit.unitname}}
+                                    </div>
+                                    <div *ngIf="activechapter.chapterlocked==0&&unit.mouseover" class="listIcons">
+                                        <span matTooltip="Unit verschieben" (click)="openMoveElement(unit.unitid, 'chapter');$event.stopPropagation()">
+                                            <mat-icon class="mat-icon-scaledown">input</mat-icon>
+                                        </span>
+                                        <ng-container *ngIf="unitList.length>1">
+                                            <span matTooltip="Position nach oben" [matTooltipDisabled]="unit.unitposition == 0" (click)="changePosition('unit', unit.unitposition,-1,unit.unitid)" [ngStyle]="{'color':unit.unitposition == 0 ? '#CCC' : 'black' }">
+                                                <mat-icon>keyboard_arrow_up</mat-icon>
+                                            </span>
+                                            <span matTooltip="Position nach unten" [matTooltipDisabled]="unit.unitposition == (unitList.length-1)" (click)="changePosition('unit', unit.unitposition,1,unit.unitid)" [ngStyle]="{'color':unit.unitposition == (unitList.length-1) ? '#CCC' : 'black' }">
+                                                <mat-icon>keyboard_arrow_down</mat-icon>
+                                            </span>
+                                        </ng-container>
+                                    </div>
+                                </li>
+                                <li class="list-group-item list-group-add list-group-item-action" (click)="addUnit()"><b>Unit hinzuf&uuml;gen</b></li>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+
+    <div [ngClass]="{'saveAlertBg': contentCheckPartBg}">
+        <ul class="list-group" *ngIf="book[0]&&depth==1" [@fadeNoOut]>
+            <li class="list-group-item list-header" (click)="showEditAuthors=!showEditAuthors">
+                <span>Autoren</span>
+                <span *ngIf="showEditAuthors"><mat-icon>expand_more</mat-icon></span>
+                <span *ngIf="!showEditAuthors"><mat-icon>expand_less</mat-icon></span>
+            </li>
+            <li class="list-group-item" *ngIf="!showEditAuthors" [@toggle]>
+                <div class="row">
+                    <div class="col-3">
+                        <div class="form-group">
+                            <ul class="list-group list-group_no_margin">
+                                <div id="booklist">
+                                    <li *ngFor="let author of authorList" [ngClass]="{'list-group-item-primary': author.status}" (click)="selectAuthor(author.authorid)" class="list-group-item list-group-item-action" style="cursor:pointer;">
+                                        
+                                        <span *ngIf="author.authorfirstname!=''||author.authorsurname!=''">{{author.authorfirstname}} {{author.authorsurname}}</span>
+                                        <span *ngIf="author.authorfirstname==''&&author.authorsurname==''">Neuer Autor</span>
+
+                                        <div *ngIf="author.status" class="author_position">
+                                            <span matTooltip="Position nach oben" [matTooltipDisabled]="author.authorposition == 0" (click)="changePosition('author', author.authorposition,-1,author.authorid)" [ngStyle]="{'color':author.authorposition == 0 ? '#CCC' : 'black' }">
+                                                <mat-icon>keyboard_arrow_up</mat-icon>
+                                            </span>
+                                            <span matTooltip="Position nach unten" [matTooltipDisabled]="author.authorposition == (authorList.length-1)" (click)="changePosition('author', author.authorposition,1,author.authorid)" [ngStyle]="{'color':author.authorposition == (authorList.length-1) ? '#CCC' : 'black' }">
+                                                <mat-icon>keyboard_arrow_down</mat-icon>
+                                            </span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item list-group-add list-group-item-action" (click)="addAuthor()"><b>Autor hinzuf&uuml;gen</b></li>
+                                </div>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-9" *ngIf="activeauthor">
+                        <input type="input" class="form-control" placeholder="Vorname Autor" [(ngModel)]="activeauthor.authorfirstname">
+                        <input type="input" class="form-control" placeholder="Nachname Autor" [(ngModel)]="activeauthor.authorsurname">
+                        <div class="infoTitleContainer">
+                            <div class="infoTitle infoTitleJodit">Text f&uuml;r das Autorenverzeichnis</div>
+                            <jodit-editor [(ngModel)]="activeauthor.authortext" (onClick)="insertReference($event, activeauthor, 'author', 'authortext');" (onBlur)="activeauthor.authortext = textReplaceTagsRegex(activeauthor.authortext);"
+                            [config]="jodit_config"></jodit-editor>
+                        </div>
+                        <button type="submit" class="btn btn-success" (click)="saveAuthor(activeauthor);">Autor speichern</button>
+                        <button type="submit" class="btn btn-danger" (click)="activeauthor.showDelete=true">Autor l&ouml;schen</button>
+                        <div *ngIf="activeauthor.showDelete" class="error" [@fade]="activeauthor.showDelete ? 'show': 'hide'">
+                            Bist du sicher?
+                            <a (click)="deleteAuthor(activeauthor);">Ja</a> | 
+                            <a (click)="activeauthor.showDelete=false">Nein</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        <ul class="list-group" *ngIf="book[0]&&depth==1" [@fadeNoOut]>
+            <li class="list-group-item list-header" (click)="showEditAbstract=!showEditAbstract">
+                <span>Informationen</span>
+                <span *ngIf="showEditAbstract"><mat-icon>expand_more</mat-icon></span>
+                <span *ngIf="!showEditAbstract"><mat-icon>expand_less</mat-icon></span>
+            </li>
+            <li class="list-group-item" *ngIf="!showEditAbstract" [@toggle]>
+                <div class="infoTitleText">Abstract (long)</div>
+                <jodit-editor [(ngModel)]="book[0].abstract" (onClick)="insertReference($event, book[0], 'book', 'abstract');" (onBlur)="book[0].abstract = textReplaceTagsRegex(book[0].abstract);"
+                [config]="jodit_config"></jodit-editor>
+                <div class="distance"></div>
+                <div class="infoTitleText">Abstract (short)</div>
+                <jodit-editor [(ngModel)]="book[0].bookblurb" (onBlur)="book[0].bookblurb = textReplaceTagsRegex(book[0].bookblurb);"
+                [config]="jodit_config"></jodit-editor>
+                <div class="distance"></div>
+                <div class="infoTitleText">Impressum</div>
+                <jodit-editor [(ngModel)]="book[0].bookimpressum" (onBlur)="book[0].bookimpressum = textReplaceTagsRegex(book[0].bookimpressum);"
+                [config]="jodit_config"></jodit-editor>
+                <div class="distance"></div>
+                <div class="infoTitleText">Verkaufstext</div>
+                <jodit-editor [(ngModel)]="book[0].booksale" (onBlur)="book[0].booksale = textReplaceTagsRegex(book[0].booksale);"
+                [config]="jodit_config"></jodit-editor>
+                <div class="distance"></div>
+                <div class="infoTitleText">Impressum Übersichtstext</div>
+                <jodit-editor [(ngModel)]="book[0].booksummary" (onBlur)="book[0].booksummary = textReplaceTagsRegex(book[0].booksummary);"
+                [config]="jodit_config"></jodit-editor>
+                <div class="distance"></div>
+                <div class="infoTitleText">Arbeitsaufteilung</div>
+                <jodit-editor [(ngModel)]="book[0].booklabor" (onBlur)="book[0].booklabor = textReplaceTagsRegex(book[0].booklabor);"
+                [config]="jodit_config"></jodit-editor>
+                <div class="distance"></div>
+                <div class="infoTitleText">Dank</div>
+                <jodit-editor [(ngModel)]="book[0].thanks" (onBlur)="book[0].thanks = textReplaceTagsRegex(book[0].thanks);"
+                [config]="jodit_config"></jodit-editor>
+                <div class="distance"></div>
+                <div class="distance"></div>
+                    Buch-Cover für die Webseite
+                <div class="distance"></div>
+                <div class="distance"></div>
+
+                <input #coverUpload type="file" accept='image/*' (change)="uploadBookCover(coverUpload.files)" style="display:none;"/>
+                <div class="error" *ngIf="book[0].uploadCoverError">Dies ist keine g&uuml;ltige Datei. Bitte w&auml;hle eine andere.</div>
+                <div *ngIf="book[0].uploadCoverRun">
+                    Datei wird hochgeladen...
+                    <div class="progress_bar">
+                        <div [style.width.%]="book[0].uploadCoverState.message" class="progress_bar_loader">
+                            <div class="progress_bar_percent">{{book[0].uploadCoverState.message}} %</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button *ngIf="!book[0].bookcover&&!book[0].uploadCoverRun" type="submit" class="btn btn-success" (click)="coverUpload.file=false;coverUpload.click()">Cover hochladen</button>
+
+                <div *ngIf="book[0].bookcover&&book[0].bookcover!=''">
+                    <img src="{{book[0].bookcover}}" style="max-height:500px;"/>
+                    <div class="distance"></div>
+                    <div class="distance"></div>
+                    <button type="submit" class="btn btn-danger" (click)="deleteCoverShow=true">Cover l&ouml;schen</button>
+                    <div *ngIf="deleteCoverShow" class="error" [@fade]>
+                        Achtung: Du m&ouml;chtest das Cover zum Buch <u>{{book[0].bookname}}</u> löschen.
+                        Bist du sicher?
+                        <a (click)="book[0].bookcover=false">Ja</a> | 
+                        <a (click)="deleteCoverShow=false">Nein</a>
+                    </div>
+                </div>
+
+                <div class="distance"></div>
+
+                <input #twitterUpload type="file" accept='image/*' (change)="uploadBookTwitterimage(twitterUpload.files)" style="display:none;"/>
+                <div class="error" *ngIf="book[0].uploadTwitterError">Dies ist keine g&uuml;ltige Datei. Bitte w&auml;hle eine andere.</div>
+                <div *ngIf="book[0].uploadTwitterRun">
+                    Datei wird hochgeladen...
+                    <div class="progress_bar">
+                        <div [style.width.%]="book[0].uploadTwitterState.message" class="progress_bar_loader">
+                            <div class="progress_bar_percent">{{book[0].uploadTwitterState.message}} %</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button *ngIf="!book[0].twitterimage&&!book[0].uploadTwitterRun" type="submit" class="btn btn-success" (click)="twitterUpload.file=false;twitterUpload.click()">Twitterbild hochladen</button>
+
+                <div *ngIf="book[0].twitterimage&&book[0].twitterimage!=''">
+                    <img src="{{book[0].twitterimage}}" style="max-height:500px;"/>
+                    <div class="distance"></div>
+                    <div class="distance"></div>
+                    <button type="submit" class="btn btn-danger" (click)="deleteTwitterShow=true">Twitterbild l&ouml;schen</button>
+                    <div *ngIf="deleteTwitterShow" class="error" [@fade]>
+                        Achtung: Du m&ouml;chtest das Twitterbild zum Buch <u>{{book[0].bookname}}</u> löschen.
+                        Bist du sicher?
+                        <a (click)="book[0].twitterimage=false">Ja</a> | 
+                        <a (click)="deleteTwitterShow=false">Nein</a>
+                    </div>
+                </div>
+
+                <div class="distance"></div>
+                <button type="submit" class="btn btn-success" (click)="saveBook(book[0])">Daten speichern</button>
+            </li>
+        </ul>
+
+
+        <ul class="list-group" *ngIf="book[0]&&depth==1" [@fadeNoOut]>
+            <li class="list-group-item list-header" (click)="showBookPdf=!showBookPdf">
+                <span>PDF-Datei</span>
+                <span *ngIf="showBookPdf"><mat-icon>expand_more</mat-icon></span>
+                <span *ngIf="!showBookPdf"><mat-icon>expand_less</mat-icon></span>
+            </li>
+            <li class="list-group-item" *ngIf="showBookPdf" [@toggle]>
+                Hier kannst du das fertige Ausgaben-PDF f&uuml;r die Webseite hochladen oder l&ouml;schen.
+                <div class="distance"></div>
+
+                <input #pdfUpload type="file" accept='application/pdf' (change)="uploadPDF(pdfUpload.files, book[0], 'book')" style="display:none;"/>
+                <div class="error" *ngIf="book[0].uploadPDFError">Dies ist keine g&uuml;ltige Datei. Bitte w&auml;hle eine andere.</div>
+                <div *ngIf="book[0].uploadPDFRun">
+                    Datei wird hochgeladen...
+                    <div class="progress_bar">
+                        <div [style.width.%]="book[0].uploadPdfState.message" class="progress_bar_loader">
+                            <div class="progress_bar_percent">{{book[0].uploadPdfState.message}} %</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="distance"></div>
+                <button *ngIf="!book[0].bookpdf" type="submit" class="btn btn-success" (click)="pdfUpload.file=false;pdfUpload.click()">PDF hochladen</button>
+
+                <div *ngIf="book[0].bookpdf&&book[0].bookpdf!=''">
+                    <a href="{{book.bookpdf}}" target="_blank">{{book[0].bookpdf}}</a>
+                    <div class="distance"></div>
+                    <div class="distance"></div>
+                    <button type="submit" class="btn btn-danger" (click)="deleteBookPDFShow=true">PDF l&ouml;schen</button>
+                    <div *ngIf="deleteBookPDFShow" class="error" [@fade]>
+                        Achtung: Du m&ouml;chtest das PDF zu der Ausgabe <u>{{book[0].bookname}}</u> löschen.
+                        Bist du sicher?
+                        <a (click)="deleteBookPDF();">Ja</a> | 
+                        <a (click)="deleteBookPDFShow=false">Nein</a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        <ul class="list-group" *ngIf="showEditorialInformation" [@fadeNoOut]>
+            <li class="list-group-item list-header">
+                <span (click)="showEditEditorial=!showEditEditorial">Editorial </span>
+                <span *ngIf="showEditEditorial"><mat-icon>expand_more</mat-icon></span>
+                <span *ngIf="!showEditEditorial"><mat-icon>expand_less</mat-icon></span>
+                
+                <div class="dataListElementIcons" style="margin-top: -23px;">
+                    <span matTooltip="Vorschau des Editorials & der weiterf&uuml;hrender Literatur" style="cursor:pointer;" (click)="saveBook(book[0], true);">
+                        <mat-icon>portrait</mat-icon>
+                    </span>
+                </div>
+            </li>
+            <li class="list-group-item" *ngIf="!showEditEditorial" [@toggle]>
+                <jodit-editor [(ngModel)]="book[0].editorial" (onClick)="insertReference($event, book[0], 'book', 'editorial');book[0].insertReference=false;" (onBlur)="book[0].editorial = textReplaceTagsRegex(book[0].editorial);getDataNumbersOfReference('book')"
+                [config]="jodit_config"></jodit-editor>
+                <div class="distance"></div>
+                <div class="list_container" [ngClass]="{'list_text_autoheight': reference.height}" *ngFor="let reference of book[0].bookreference" [ngStyle]="{'opacity':reference.isDeleted ? '0.4' : '1' }">
+                    <div class="list_field" style="height:auto;">
+                        <span *ngIf="!reference.isDeleted">{{reference.referenceposition}}</span>
+                        <span *ngIf="reference.isDeleted">X</span>
+                    </div>
+
+                    <div class="list_text">
+                        <div class="list_text_inner" [ngClass]="{'list_text_inner_autoheight': reference.height}">
+                            <jodit-editor (click)="reference.height=true;" (onBlur)="reference.height=false;reference.referencetext=checkReferenceTextBlur(reference.referencetext)" [(ngModel)]="reference.referencetext" [disabled]="reference.isDeleted"
+                            [config]="jodit_config_reference"></jodit-editor>
+                        </div>
+                    </div>
+                    <div class="list_field" style="height:auto;">
+                        <mat-icon class="list_icon" (click)="reference.isDeleted=true;removeReference(book[0].bookid,reference.referenceposition, 'book')"  matTooltip="delete reference">delete</mat-icon>
+                    </div>
+                </div>
+                <div class="list_container">
+                    <div class="list_field">
+                        <mat-icon class="list_icon">add</mat-icon>
+                    </div>
+                    <div class="list_text list_text_add" (click)="book[0].insertReference=true;">
+                        <span *ngIf="!book[0].insertReference">Klicke hier um eine neue Referenz einzutragen.</span>
+                        <span *ngIf="book[0].insertReference">Klicke nun im Text an die Stelle, an welcher du die Referenz eintragen möchtest.</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success" (click)="saveBook(book[0]);">Editorial speichern</button>
+                <button type="submit" class="btn btn-primary" (click)="openAddress()">Verweis hinzuf&uuml;gen</button>
+            </li>
+        </ul>
+
+        <!-- Weiterführende Literatur Buch (im Editorial-menu)-->
+        <ul class="list-group" *ngIf="showEditorialInformation" [@fadeNoOut]>
+            <li class="list-group-item list-header" (click)="showEditFurtherreadings=!showEditFurtherreadings">
+                <span>Weiterf&uuml;hrende Literatur </span>
+                <span *ngIf="showEditFurtherreadings"><mat-icon>expand_more</mat-icon></span>
+                <span *ngIf="!showEditFurtherreadings"><mat-icon>expand_less</mat-icon></span>
+            </li>
+            <li class="list-group-item" *ngIf="!showEditFurtherreadings" [@toggle]>
+                <jodit-editor [(ngModel)]="book[0].furtherreadings" (onClick)="insertReference($event, book[0], 'book', 'furtherreadings');" (onBlur)="book[0].furtherreadings = textReplaceTagsRegex(book[0].furtherreadings);"
+                [config]="jodit_config"></jodit-editor>
+                <div class="distance"></div>
+                <button type="submit" class="btn btn-success" (click)="saveBook(book[0]);">Weiterf&uuml;hrende Literatur speichern</button>
+            </li>
+        </ul>
+
+        <ul class="list-group" *ngIf="activepart&&depth==2&&!showEditorialInformation" [@fadeNoOut]>
+            <li class="list-group-item list-header" (click)="showEditPart=!showEditPart">
+                <span>Einstellungen</span>
+                <span *ngIf="showEditPart"><mat-icon>expand_more</mat-icon></span>
+                <span *ngIf="!showEditPart"><mat-icon>expand_less</mat-icon></span>
+            </li>
+            <li class="list-group-item" *ngIf="showEditPart" [@toggle]>
+                <div class="form-group">
+                    <div class="form-floating mb-3">
+                        <input type="input" class="form-control" [(ngModel)]="activepart.partname" id="partname" (change)="contentCheckPart=true">
+                        <label for="partname">Partname</label>
+                      </div>
+                      
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" [(ngModel)]="activepart.part_showauthor" id="showAuthorsInPrint">
+                        <label class="form-check-label" for="showAuthorsInPrint">Autoren im Print anzeigen</label><br/>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" [(ngModel)]="activepart.part_showauthorweb" id="showAuthorsInWeb">
+                        <label class="form-check-label" for="showAuthorsInWeb">Autoren im Web anzeigen</label><br/>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" [(ngModel)]="activepart.part_showweb" id="showAuthorsInPrint">
+                        <label class="form-check-label" for="showAuthorsInPrint">Part im Web anzeigen (auch wenn kein Kapitel aktiv)</label><br/>
+                    </div>
+                </div>
+                    <button type="submit" class="btn btn-success" (click)="savePart();contentCheckPart=false;">Speichern</button>
+                    <button type="submit" class="btn btn-danger" (click)="deletepartForm=true">Part l&ouml;schen</button>
+
+                    <div *ngIf="activepart.editPartNameMissing" class="error">Bitte gib einen Partnamen ein</div>
+
+                <div *ngIf="deletepartForm" class="error" [@fade]="deletepartForm ? 'show': 'hide'">
+                    Achtung: Du m&ouml;chtest den Part <u>{{activepart.partname}}</u>. löschen.
+                    Bist du sicher?
+                    <a (click)="deleteElement('part');contentCheckPart=false">Ja</a> | 
+                    <a (click)="deletepartForm=false">Nein</a>
+                </div>
+            </li>
+        </ul>
+
+        <ul class="list-group" *ngIf="activepart&&depth==2&&!showEditorialInformation" [@fadeNoOut]>
+            <li class="list-group-item list-header">
+                <div style="float:left" (click)="showAttachementsPart=!showAttachementsPart">
+                    <span>Anhänge in der Druckversion</span>
+                    <span *ngIf="showAttachementsPart"><mat-icon>expand_more</mat-icon></span>
+                    <span *ngIf="!showAttachementsPart"><mat-icon>expand_less</mat-icon></span>
+                </div>
+            </li>
+            <ng-container *ngIf="showAttachementsPart">
+                <li class="list-group-item">
+                    <div class="container-fluid" style="padding:0px;">
+                        <div class="row g-2">
+                            <div class="col-md">
+                              <div class="form-floating">
+                                <select class="form-select" id="addblogeintrag"
+                                [(ngModel)]="activepart.addattachementblog" (change)="addAttachement(0, activepart.addattachementblog)">
+                                    <option value="-1">Blogeintrag auswählen</option>
+                                    <option *ngFor="let blog of blogList" [(ngValue)]="blog.blog_dataid">{{blog.blog_title}}</option>
+                                </select>
+                                <label for="addblogeintrag">Blogeintrag hinzufügen</label>
+                              </div>
+                            </div>
+                            <div class="col-md">
+                              <div class="form-floating">
+                                <select class="form-select" id="addrepliceintrag"
+                                [(ngModel)]="activepart.addattachementreplic" (change)="addAttachement(1, activepart.addattachementreplic)">
+                                    <option value="-1">Replik auswählen</option>
+                                    <option *ngFor="let replic of replic" [(ngValue)]="replic.replicid">{{replic.replicheadline}}</option>
+                                </select>
+                                <label for="addrepliceintrag">Replik hinzufügen</label>
+                              </div>
+                            </div>
+                          </div>
+                    </div>
+                </li>
+                <li class="list-group-item" *ngFor="let attachement of activepart.attachement; let l = count">
+                    <div class="dataListElement">
+                        <div class="dataListElementText">
+                            <span *ngIf="attachement.attachementtype==0">Blog: </span>
+                            <span *ngIf="attachement.attachementtype==1">Replik: </span>
+                            {{attachement.attachementname}}
+                        </div>
+                        <div class="dataListElementIcons">
+                            <span matTooltip="Position nach oben" [matTooltipDisabled]="attachement.attachementposition == 0" (click)="changepositionAttachement(attachement.attachementid,-1)" [ngStyle]="{'color':attachement.attachementposition == 0 ? '#CCC' : 'black' }">
+                                <mat-icon>keyboard_arrow_up</mat-icon>
+                            </span> 
+                            <span matTooltip="Position nach unten" [matTooltipDisabled]="attachement.attachementposition == (l-1)" (click)="changepositionAttachement(attachement.attachementid,1)" [ngStyle]="{'color':attachement.attachementposition == (l-1) ? '#CCC' : 'black' }">
+                                <mat-icon>keyboard_arrow_down</mat-icon>
+                            </span>
+
+                            <span matTooltip="Seitenumbruch löschen" (click)="deleteAttachement(attachement.attachementid)">
+                                <mat-icon>delete_outline</mat-icon>
+                            </span>
+
+                        </div>
+                    </div>
+                </li>
+            </ng-container>
+        </ul>
+
+        <ul class="list-group" *ngIf="(activepart&&depth==2)||showEditorialInformation" [@fadeNoOut]>
+            <li class="list-group-item list-header">
+                <div style="float:left" (click)="showImagesPart=!showImagesPart">
+                    <span>Anzeigebilder Web</span>
+                    <span *ngIf="showImagesPart"><mat-icon>expand_more</mat-icon></span>
+                    <span *ngIf="!showImagesPart"><mat-icon>expand_less</mat-icon></span>
+                </div>
+                <div class="dataListElementIcons">
+                    <input #fileUploadPart type="file" accept='image/jpg,image/jpeg,image/png' (change)="checkImagePart(fileUploadPart.files)" style="display:none;"/>
+                    <span (click)="fileUploadPart.click()" class="cursor">Bild hinzuf&uuml;gen</span>
+                </div>
+            </li>
+            <li class="list-group-item" *ngIf="!showImagesPart">
+
+                <div *ngIf="activepart.imagePreview" [@fade]="activepart.imagePreview ? 'show': 'hide'">
+                    <img src="{{activepart.imagePreview}}" class="previewLink">
+
+                    Dies ist eine Vorschau. M&ouml;chtest du die angezeigte Datei hochladen?
+                    <a (click)="uploadImagePart();">Ja </a> | 
+                    <a (click)="activepart.imagePreview=false">Nein</a>
+                
+                </div>
+
+                <div class="part_image_container">
+                    <div class="part_image_box" *ngFor="let image of activepart.images">
+                        <div class="part_image_image" [ngStyle]="{'background-image':'url(\'' + image.imagelink + '\')'}"></div>
+                        <div class="part_image_bar">
+                            {{image.imagelink}}
+                            <div class="part_image_button" (click)="deleteImagePart(image.imageid)"><mat-icon>delete_outline</mat-icon></div>
+                        </div>
+                    </div>
+                </div>
+
+            </li>
+        </ul>
+        <ul class="list-group" *ngIf="showEditorialInformation" [@fadeNoOut]>
+            <li class="list-group-item list-header">
+                <div style="float:left" (click)="showAuthorEpilog=!showAuthorEpilog">
+                    <span>Autoren</span>
+                    <span *ngIf="showImagesPart"><mat-icon>expand_more</mat-icon></span>
+                    <span *ngIf="!showImagesPart"><mat-icon>expand_less</mat-icon></span>
+                </div>
+            </li>
+            <li class="list-group-item" *ngIf="!showAuthorEpilog">
+            <div class="form-group">
+                <div class="row">
+                    <div class="newDataContainer col-3" style="cursor:default" *ngFor="let author of activechapter.author" (mouseenter)="author.mouseover=true" (mouseleave)="author.mouseover=false">
+                        <div class="newDataContainer_text add_author_field" matTooltip="{{author.authorfirstname}} {{author.authorsurname}}" >
+                            {{author.authorfirstname}} {{author.authorsurname}}
+                            <span *ngIf="author.mouseover">
+                                <span class="author_position_left" (click)="changePosition('author', author.authorposition,-1, author.authorid, activechapter.chapterid)" [ngStyle]="{'color':author.authorposition == 0 ? '#CCC' : 'black' }">
+                                    <mat-icon>keyboard_arrow_left</mat-icon>
+                                </span>
+                                <span class="author_position_right" (click)="changePosition('author', author.authorposition,1, author.authorid, activechapter.chapterid)" [ngStyle]="{'color':author.authorposition == (activechapter.author.length) ? '#CCC' : 'black' }">
+                                    <mat-icon>keyboard_arrow_right</mat-icon>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="newDataContainer_field">
+                            <mat-icon class="list_icon" (click)="deleteAuthorChapter(author.authorid, activechapter.chapterid)">delete</mat-icon>
+                        </div>
+                    </div>
+
+                    <div class="newDataContainer col-3">
+                        <div class="newDataContainer_text add_author_field" style="padding:0px">
+                            <select class="add_author" (change)="addAuthorChapter($event.target.value, activechapter.chapterid);$event.target.value=0;">
+                                <option value="0">Autor hinzuf&uuml;gen</option>
+                                <option *ngFor="let author of activechapter.authorlist" value="{{author.authorid}}">{{author.authorfirstname}} {{author.authorsurname}}</option>
+                            </select>
+                        </div>
+                        <div class="newDataContainer_field" style="cursor:pointer">
+                            <mat-icon class="list_icon">add</mat-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </li>
+        </ul>
+    </div>
+    <div [ngClass]="{'saveAlertBg': contentCheckChapterBg}">
+        <ul class="list-group" *ngIf="activechapter&&depth==3&&!showEditorialInformation" [@fadeNoOut]>
+            <li class="list-group-item list-header" (click)="showEditChapter=!showEditChapter">
+                <span>Einstellungen</span>
+                <span *ngIf="showEditChapter"><mat-icon>expand_more</mat-icon></span>
+                <span *ngIf="!showEditChapter"><mat-icon>expand_less</mat-icon></span>
+            </li>
+            <li class="list-group-item" *ngIf="showEditChapter" [@toggle]>
+
+                    <div class="form-floating mb-3">
+                        <input type="input" class="form-control" [(ngModel)]="activechapter.chaptername" id="chaptername" (change)="contentCheckChapter=true">
+                        <label for="alertmail">Kapitelname</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="input" class="form-control" [(ngModel)]="activechapter.keywords" id="keywords" placeholder="SEO Keywords (Komma-getrennt)">
+                        <label for="keywords">SEO Keywords (Komma-getrennt)</label>
+                    </div>
+                    <div class="form-group">
+
+                        <ul class="list-group">
+                            <li class="list-group-item list-header">
+                                    <span>Autoren</span>
+                            </li>
+                            <li class="list-group-item list-element" *ngFor="let author of activechapter.author" (mouseenter)="author.mouseover=true" (mouseleave)="author.mouseover=false">
+                                {{author.authorfirstname}} {{author.authorsurname}}
+                                <div style="float:right;cursor:pointer" class="maticon-list" *ngIf="author.mouseover&&activechapter.chapterlocked==0">
+                                        <mat-icon (click)="changePosition('author', author.authorposition,-1, author.authorid, activechapter.chapterid)"
+                                        [ngStyle]="{'color':author.authorposition == 0 ? '#CCC' : 'black' }">keyboard_arrow_up</mat-icon>
+                                        <mat-icon (click)="changePosition('author', author.authorposition,1, author.authorid, activechapter.chapterid)"
+                                        [ngStyle]="{'color':author.authorposition == (activechapter.author.length-1) ? '#CCC' : 'black' }">keyboard_arrow_down</mat-icon>
+                                        <mat-icon (click)="deleteAuthorChapter(author.authorid, activechapter.chapterid)">delete</mat-icon>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="form-floating">
+                            <select class="form-select" id="addauthor" (change)="addAuthorChapter($event.target.value, activechapter.chapterid);$event.target.value=0;">
+                                <option value="0">Autor hinzuf&uuml;gen</option>
+                                <option *ngFor="let author of activechapter.authorlist" value="{{author.authorid}}">{{author.authorfirstname}} {{author.authorsurname}}</option>
+                            </select>
+                            <label for="addauthor">Autor hinzufügen</label>
+                        </div>
+
+                        <div class="distance"></div>
+                        <div class="distance"></div>
+                        <div class="infoTitleContainer">
+                            <div class="infoTitle infoTitleJodit">Weiterf&uuml;hrende Literatur</div>
+                            <jodit-editor [(ngModel)]="activechapter.chapterfurtherreading" (onClick)="insertReference($event, activechapter, 'chapter', 'furtherreadings');" [ngModelOptions]="{standalone: true}"
+                            [config]="jodit_config" (onBlur)="activechapter.chapterfurtherreading = textReplaceTagsRegex(activechapter.chapterfurtherreading);">
+                            </jodit-editor>
+                        </div>
+
+
+
+
+
+                        <div class="form-floating mb-3">
+                            <input type="input" id="veroeffentlichunsdatum"
+                                class="form-control" matInput [matDatepicker]="picker3" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="activechapter.chapterreleasedate" (change)="contentCheckChapter=true">
+                            <label for="veroeffentlichunsdatum">Veröffentlichungsdatum</label>
+                            <mat-datepicker-toggle matSuffix [for]="picker3" style="float: right;margin-top: -67px;margin-right: 15px;"></mat-datepicker-toggle>
+                            <mat-datepicker #picker3 disabled="false"></mat-datepicker>
+                        </div>
+
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" [(ngModel)]="activechapter.chapterweb" [ngModelOptions]="{standalone: true}">
+                            <label class="form-check-label" for="chapterweb">Sichtbar im Web</label>
+                        </div>
+
+                            <div class="distance"></div>
+
+                            <ng-container *ngIf="activechapter.chapterlocked==0">
+                                <button type="submit" class="btn btn-success" (click)="saveChapter();contentCheckChapter=false;">Speichern</button>
+                                <button type="submit" class="btn btn-danger" (click)="deletechapterForm=true">Kapitel l&ouml;schen</button>
+                            </ng-container>
+
+                        <div *ngIf="activechapter.editChapterNameMissing" class="error">Bitte gib einen Kapitelnamen ein</div>
+
+                    <div *ngIf="deletechapterForm" class="error" [@fade]>
+                        Achtung: Du m&ouml;chtest das Kapitel <u>{{activechapter.chaptername}}</u>. löschen.
+                        Bist du sicher?
+                        <a (click)="deleteElement('chapter');contentCheckChapter=false">Ja</a> | 
+                        <a (click)="deletechapterForm=false">Nein</a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div>
+        <ul class="list-group" *ngIf="(activechapter&&depth==3)||showEditorialInformation" [@fadeNoOut]>
+            <li class="list-group-item list-header" (click)="showChapterPDF=!showChapterPDF">
+                <span>PDF-Datei</span>
+                <span *ngIf="showChapterPDF"><mat-icon>expand_more</mat-icon></span>
+                <span *ngIf="!showChapterPDF"><mat-icon>expand_less</mat-icon></span>
+            </li>
+            <li class="list-group-item" *ngIf="showChapterPDF" [@toggle]>
+                Hier kannst du das fertige Kapitel-PDF f&uuml;r die Webseite hochladen oder l&ouml;schen.
+                <div class="distance"></div>
+
+                <input #pdfUpload type="file" accept='application/pdf' (change)="uploadPDF(pdfUpload.files, activechapter, 'chapter')" style="display:none;"/>
+                <div class="error" *ngIf="activechapter.uploadPDFError">Dies ist keine g&uuml;ltige Datei. Bitte w&auml;hle eine andere.</div>
+                <div *ngIf="activechapter.uploadPDFRun">
+                    Datei wird hochgeladen...
+                    <div class="progress_bar">
+                        <div [style.width.%]="activechapter.uploadPdfState.message" class="progress_bar_loader">
+                            <div class="progress_bar_percent">{{activechapter.uploadPdfState.message}} %</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="distance"></div>
+                <button *ngIf="!activechapter.chapterpdf&&activechapter.chapterlocked==0" type="submit" class="btn btn-success" (click)="pdfUpload.file=false;pdfUpload.click()">PDF hochladen</button>
+
+                <div *ngIf="activechapter.chapterpdf&&activechapter.chapterpdf!=''">
+                    <a href="{{activechapter.chapterpdf}}" target="_blank">{{activechapter.chapterpdf}}</a>
+                    <div class="distance"></div>
+                    <div class="distance"></div>
+                    <ng-container *ngIf="activechapter.chapterlocked==0">
+                        <button type="submit" class="btn btn-danger" (click)="deleteChapterPDFShow=true">PDF l&ouml;schen</button>
+                        <div *ngIf="deleteChapterPDFShow" class="error" [@fade]>
+                            Achtung: Du m&ouml;chtest das PDF zum Kapitel <u>{{activechapter.chaptername}}</u> löschen.
+                            Bist du sicher?
+                            <a (click)="deleteChapterPDF();">Ja</a> | 
+                            <a (click)="deleteChapterPDFShow=false">Nein</a>
+                        </div>
+                    </ng-container>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div [ngClass]="{'saveAlertBg': contentCheckUnitBg}">
+        <ul class="list-group" *ngIf="activeunit&&depth==4" [@fadeNoOut]>
+                <li class="list-group-item list-header" (click)="showEditUnit=!showEditUnit">
+                    <span>Einstellungen </span>
+                    <span *ngIf="showEditUnit"><mat-icon>expand_more</mat-icon></span>
+                    <span *ngIf="!showEditUnit"><mat-icon>expand_less</mat-icon></span>
+                </li>
+            <li class="list-group-item list-group-item-cursor" *ngIf="showEditUnit" [@toggle]>
+                <div class="form-floating mb-3">
+                    <input type="input" class="form-control" [(ngModel)]="activeunit.unitname" id="unitname" (change)="contentCheckUnit=true">
+                    <label for="unitname">Unitname</label>
+                </div>
+                <ng-container *ngIf="activechapter.chapterlocked==0">
+                    <button type="submit" class="btn btn-success" (click)="saveUnit();contentCheckUnit=false;">Speichern</button>
+                    <button type="submit" class="btn btn-danger" (click)="deleteunitForm=true">Unit l&ouml;schen</button>
+                </ng-container>
+
+                <div *ngIf="deleteunitForm" class="error" [@fade]>
+                    Achtung: Du m&ouml;chtest die Unit <u>{{activeunit.unitname}}</u>. löschen.
+                    Bist du sicher?
+                    <a (click)="deleteElement('unit');contentCheckUnit=false">Ja</a> | 
+                    <a (click)="deleteunitForm=false">Nein</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <ul class="list-group" *ngIf="activeunit&&depth==4">
+            <li class="list-group-item list-header">
+                <div style="float:left;cursor:pointer;" (click)="showEditContent=!showEditContent">
+                    <span>Inhalt</span>
+                    <span *ngIf="showEditContent"><mat-icon>expand_more</mat-icon></span>
+                    <span *ngIf="!showEditContent"><mat-icon>expand_less</mat-icon></span>
+                </div>
+                <ng-container *ngIf="activechapter.chapterlocked==0">
+                    <span style="float:right;cursor:pointer;" (click)="addData()">Neues Element</span>
+                </ng-container>
+            </li>
+            <div *ngIf="showEditContent">
+            <li class="list-group-item" *ngIf="data?.length==0" style="cursor:default">Klicke "Inhalt hinzuf&uuml;gen" um einen neuen Block zu generieren</li>
+            <li class="list-group-item" *ngFor="let dataElement of data" [ngClass]="{'saveAlertBg': dataElement.contentCheckTextBg}" [@toggle] (mouseenter)="dataElement.mouseover=true" (mouseleave)="dataElement.mouseover=false">
+                    <div class="dataListElement">
+                        <div class="dataListElementText" (click)="dataElement.editContent=!dataElement.editContent">{{datatypes[dataElement.datatype]}}
+                            <span *ngIf="dataElement.datatype==1&&dataElement.datalayout==0">Haupttext</span>
+                            <span *ngIf="dataElement.datatype==1&&dataElement.datalayout==1">Zitat klein</span>
+                            <span *ngIf="dataElement.datatype==1&&dataElement.datalayout==2">Zitat gross</span>
+                            <span *ngIf="dataElement.datatype==2&&dataElement.datalayout==0">gross</span>
+                            <span *ngIf="dataElement.datatype==2&&dataElement.datalayout==1">klein</span>
+                        </div>
+
+                        <div class="dataListElementPrewviewText" *ngIf="dataElement.datatype!=0&&dataElement.datatype!=8" (click)="dataElement.editContent=!dataElement.editContent">
+                            <span *ngIf="dataElement.datatype==1&&dataElement.datalayout==0" [innerHTML]="dataElement.datatext"></span>
+                            <span *ngIf="!(dataElement.datatype==1&&dataElement.datalayout==0)" [innerHTML]="dataElement.datasource"></span>
+                        </div>
+                        <div class="dataListElementIcons" *ngIf="dataElement.mouseover">
+                            <span matTooltip="Vorschau des Elements in der Print-Version" *ngIf="dataElement.datatype!=7" (click)="saveDataInfo(dataElement, true);">
+                                <mat-icon class="mat-icon-scaledown">portrait</mat-icon>
+                            </span>
+
+                            <span matTooltip="Element verschieben" (click)="openMoveElement(dataElement.dataid, 'unit');$event.stopPropagation()">
+                                <mat-icon class="mat-icon-scaledown">input</mat-icon>
+                            </span>
+
+                            <ng-container *ngIf="activechapter.chapterlocked==0">
+                                <span matTooltip="delete page break" *ngIf="dataElement.datatype==7" (click)="deleteData(dataElement)">
+                                    <mat-icon>delete_outline</mat-icon>
+                                </span>
+
+                                <span matTooltip="Position nach oben" [matTooltipDisabled]="dataElement.dataposition == 0" (click)="changeDataPosition(dataElement,-1)" [ngStyle]="{'color':dataElement.dataposition == 0 ? '#CCC' : 'black' }">
+                                    <mat-icon>keyboard_arrow_up</mat-icon>
+                                </span>
+                                <span matTooltip="Position nach unten" [matTooltipDisabled]="dataElement.dataposition == (dataLength-1)" (click)="changeDataPosition(dataElement,+1)" [ngStyle]="{'color':dataElement.dataposition == (dataLength-1) ? '#CCC' : 'black' }">
+                                    <mat-icon>keyboard_arrow_down</mat-icon>
+                                </span>
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <!-- data edit fields -->
+                    <div *ngIf="dataElement.editContent&&dataElement.datatype!=7" class="row" style="width:100%;margin-top:60px;">
+                        <div class="col">
+
+                            <div *ngIf="dataElement.datatype==0" class="row">
+                                <div class="newDataContainer col" (click)="dataElement.datatype=8">
+                                    <div class="newDataContainer_field">
+                                        <mat-icon class="list_icon">folder</mat-icon>
+                                    </div>
+                                    <div class="newDataContainer_text">
+                                        Inhalt hinzuf&uuml;gen
+                                    </div>
+                                </div>
+                                <div class="newDataContainer col" (click)="dataElement.datatype=1">
+                                    <div class="newDataContainer_field">
+                                        <mat-icon class="list_icon">notes</mat-icon>
+                                    </div>
+                                    <div class="newDataContainer_text">
+                                        Haupttext
+                                    </div>
+                                </div>
+                                <!-- only allow page breakes for admins -->
+                                <div class="newDataContainer col" *ngIf="currentUser.permission==1" (click)="addPageBreak();deleteData(dataElement)">
+                                    <div class="newDataContainer_field">
+                                        <mat-icon class="list_icon">menu</mat-icon>
+                                    </div>
+                                    <div class="newDataContainer_text">
+                                        Seitenumbruch hinzufügen
+                                    </div>
+                                </div>
+
+                                <div class="newDataContainer col" (click)="deleteData(dataElement)">
+                                    <div class="newDataContainer_field">
+                                        <mat-icon class="list_icon">delete</mat-icon>
+                                    </div>
+                                    <div class="newDataContainer_text">
+                                        Block l&ouml;schen
+                                    </div>
+                                </div>
+                            </div>
+                                <div class="infoTitleBg" *ngIf="dataElement.datatype==2||dataElement.datatype==3||dataElement.datatype==4||dataElement.datatype==5||dataElement.datatype==6">
+                                    <a class="filelink" target="_blank" href="{{dataElement.datalink}}" *ngIf="dataElement.datalink">{{dataElement.datalink}}</a>
+                                    <span class="filelink" *ngIf="!dataElement.datalink">
+                                        Datei wird hochgeladen...
+                                        <div class="progress_bar">
+                                            <div [style.width.%]="dataElement.uploadState.message" class="progress_bar_loader">
+                                                <div class="progress_bar_percent">{{dataElement.uploadState.message}} %</div>
+                                            </div>
+                                        </div>
+                                    </span>
+                                </div>
+                            
+                            <div *ngIf="dataElement.datatype==1">
+
+                                <div *ngIf="dataElement.datatype!=1||dataElement.datalayout>0">
+                                    <div class="infoTitleContainer">
+                                        <div class="infoTitle infoTitleJodit" *ngIf="dataElement.datatype==1">Zitat</div>
+                                            <jodit-editor [(ngModel)]="dataElement.datatext"
+                                            (onClick)="dataElement.insertReference=false;insertReference($event, dataElement, 'data', 'datatext');dataElement.contentCheckTextClicked=true;"
+                                            (change)="dataElement.contentCheckTextClicked&&dataElement.contentCheckText=true"
+                                            (onBlur)="dataElement.datatext=textReplaceTagsRegex(dataElement.datatext);getDataNumbersOfReference('data');"
+                                            [config]="jodit_config"></jodit-editor>
+                                    </div>
+                                </div>
+                                <div *ngIf="dataElement.datatype==1&&dataElement.datalayout==0">
+
+                                    <div class="infoTitleContainer">
+                                        <div class="infoTitle infoTitleJodit" *ngIf="dataElement.datatype==1">Haupttext</div>
+                                            <jodit-editor [(ngModel)]="dataElement.datatext"
+                                            (onClick)="insertReference($event, dataElement, 'data', 'datatext');dataElement.insertReference=false;dataElement.contentCheckTextClicked=true;"
+                                            (change)="dataElement.contentCheckTextClicked&&dataElement.contentCheckText=true"
+                                            (onBlur)="dataElement.datatext=textReplaceTagsRegex(dataElement.datatext);getDataNumbersOfReference('data');"
+                                            [config]="jodit_config"></jodit-editor>
+                                    </div>
+                                </div>
+                                <div class="distance"></div>
+                                <div *ngIf="dataElement.datalayout==0">
+                                    <div *ngIf="(dataElement.datareference.length-dataElement.removedReferences)>dataElement.numbersOfReference" class="warning" [@fade]>
+                                        Es sind mehr Referenzen eingetragen, als im Text sind. Bitte l&ouml;sche alle ungenutzen Referenzen.
+                                    </div>
+                                    <div class="list_container" [ngClass]="{'list_text_autoheight': reference.height}" *ngFor="let reference of dataElement.datareference" [ngStyle]="{'opacity':reference.isDeleted ? '0.4' : '1' }">
+                                        <div class="list_field" style="height:auto;">
+                                            <span *ngIf="!reference.isDeleted">{{reference.referenceposition}}</span>
+                                            <span *ngIf="reference.isDeleted">X</span>
+                                        </div>
+
+                                        <div class="list_text">
+                                            <div class="list_text_inner" [ngClass]="{'list_text_inner_autoheight': reference.height}">
+                                                <jodit-editor (click)="reference.height=true;" (onBlur)="reference.height=false;reference.referencetext=checkReferenceTextBlur(reference.referencetext)" [(ngModel)]="reference.referencetext" [disabled]="reference.isDeleted"
+                                                [config]="jodit_config_reference"></jodit-editor>
+                                            </div>
+                                        </div>
+                                        <div class="list_field" style="height:auto;">
+                                            <mat-icon class="list_icon" (click)="reference.isDeleted=true;removeReference(dataElement.dataid,reference.referenceposition, 'data')"  matTooltip="delete reference">delete</mat-icon>
+                                        </div>
+                                    </div>
+                                    <div class="list_container">
+                                        <div class="list_field">
+                                            <mat-icon class="list_icon">add</mat-icon>
+                                        </div>
+                                        <div class="list_text list_text_add" (click)="dataElement.insertReference=true;">
+                                            <span *ngIf="!dataElement.insertReference">Klicke hier um eine neue Referenz einzutragen.</span>
+                                            <span *ngIf="dataElement.insertReference">Klicke nun im Text an die Stelle, an welcher du die Referenz eintragen möchtest.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span *ngIf="dataElement.datatype==1&&dataElement.datalayout==0">
+                                    <div *ngIf="dataElement.showComments">
+                                        <div class="list_container" *ngFor="let comment of dataElement.datacomment" [ngStyle]="{'opacity':comment.isDeleted ? '0.4' : '1' }">
+                                            <textarea onlyGrow [minRows]="1" autosize class="list_text list_textarea" [(ngModel)]="comment.commenttext" name="commenttext" [disabled]="comment.isDeleted" placeholder="Gib hier deinen Kommentar ein."></textarea> 
+                                            <div class="list_field list_field_dynamic">
+                                                <mat-icon class="list_icon" (click)="comment.isDeleted=true"  matTooltip="delete reference">delete</mat-icon>
+                                            </div>
+                                        </div>
+                                        <div class="list_container">
+                                            <div class="list_field">
+                                                <mat-icon class="list_icon">add</mat-icon>
+                                            </div>
+                                            <div class="list_text list_text_add" (click)="addComment(dataElement.dataid)">
+                                                <span>Klicke hier um einen Kommentar hinzuzuf&uuml;gen.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="dataElement.showExternReference">
+                                        <div class="infoTitle" style="top: 15px;height: 0px;">Verweislink</div>
+                                        <input type="input" class="form-control" [(ngModel)]="dataElement.data_referencelink"  placeholder="Verweislink">
+                                        <div class="infoTitle" style="top: 15px;height: 0px;">Verweistext</div>
+                                        <input type="input" class="form-control" [(ngModel)]="dataElement.data_referencetext"  placeholder="Verweistext">
+                                    </div>
+
+                                    <ng-container *ngIf="activechapter.chapterlocked==0">
+                                        <button type="submit" class="btn btn-success" (click)="saveData(dataElement.dataid);">Daten speichern</button>
+                                        <button type="submit" class="btn btn-danger" (click)="dataElement.showDelete=true">Haupttext l&ouml;schen</button>
+                                        <button type="submit" class="btn btn-primary" (click)="openAddress()">Verweis hinzuf&uuml;gen</button>
+                                    </ng-container>
+                                    <button type="submit" class="btn btn-primary" (click)="dataElement.showComments=!dataElement.showComments">
+                                        <span *ngIf="!dataElement.showComments">Kommentare anzeigen
+                                            <span *ngIf="dataElement.datacomment.length!=0" style="color:red;">({{dataElement.datacomment.length}})</span>
+                                        </span>
+                                        <span *ngIf="dataElement.showComments">Kommentare verbergen</span>
+                                    </button>
+                                    <div *ngIf="dataElement.showDelete" class="error" [@fade]="dataElement.showDelete ? 'show': 'hide'">
+                                        Bist du sicher?
+                                        <a (click)="deleteData(dataElement);dataElement.contentCheckText=false">Ja</a> | 
+                                        <a (click)="dataElement.showDelete=false">Nein</a>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" (click)="dataElement.showExternReference=!dataElement.showExternReference">
+                                        <span *ngIf="!dataElement.showExternReference">Externer Verweis anzeigen</span>
+                                        <span *ngIf="dataElement.showExternReference">Externer Verweis verbergen</span>
+                                    </button>
+                                </span>
+                            </div>
+                            <div *ngIf="dataElement.datatype==8">
+                                <div class="newDataContainer" (click)="fileUpload.click()">
+                                    <div class="newDataContainer_field">
+                                        <mat-icon class="list_icon">present_to_all</mat-icon>
+                                    </div>
+                                    <div class="newDataContainer_text">
+                                        Datei hochladen
+                                    </div>
+                                </div>
+                                <div class="newDataContainer" matTooltip="Gib einen link zu einem File ein und dr&uuml;cke Enter">
+                                    <div class="newDataContainer_field">
+                                        <mat-icon class="list_icon">insert_link</mat-icon>
+                                    </div>
+                                    <input class="newDataContainer_text" style="width:auto;" type="text" [(ngModel)]="dataElement.datalink" (keydown.enter)="checkDataLink(dataElement)" (change)="dataElement.linknotvalid=false;dataElement.filetypenotvalid=false" placeholder="Link zu einem Inhalt"/>
+                                </div>
+                                <input #fileUpload type="file" accept='image/jpg,image/jpeg,image/png,image/gif,audio/mp3,audio/mpeg,video/mov,video/mp4,application/pdf' (change)="checkDataFile(dataElement, fileUpload.files)" style="display:none;"/>
+
+                                <div class="newDataContainer" (click)="dataElement.datatype=1;dataElement.datalayout=1">
+                                    <div class="newDataContainer_field">
+                                        <mat-icon class="list_icon">line_weight</mat-icon>
+                                    </div>
+                                    <div class="newDataContainer_text">
+                                        Zitat einf&uuml;gen
+                                    </div>
+                                </div>
+
+                                <div *ngIf="dataElement.linknotvalid" class="error" [@fade]>
+                                    Der eingetragene Link ist nicht verf&uuml;gbar.
+                                </div>
+                                <div *ngIf="dataElement.filetypenotvalid" class="error" [@fade]="dataElement.filetypenotvalid ? 'show': 'hide'">
+                                    Das ausgew&auml;hlte File hat keinen passenden Typ. Bitte benutze .img, .jpg f&uuml;r images, .mp3,... f&uuml;r audio, .mov,.mp4 f&uuml; video und .pdf f&uuml; PDF.
+                                </div>
+                                
+                                <div *ngIf="dataElement.loadPreview" [@fade]="dataElement.loadPreview ? 'show': 'hide'">
+                                    Das File wird analysiert...
+                                </div>
+
+                                <div *ngIf="dataElement.showPreview" [@fade]="dataElement.previewLink ? 'show': 'hide'">
+                                <div *ngIf="dataElement.previewLink">
+                                        <img *ngIf="dataElement.previewtype==2" src="{{dataElement.previewLink}}" class="previewLink">
+                                        <audio *ngIf="dataElement.previewtype==3" id="audio_with_controls" controls src="{{dataElement.previewLink}}" type="audio/mp3" class="previewLink">
+                                            Dein Browser ist nicht in der Lage folgenden Link anzuzeigen: <a>{{dataElement.previewLink}}</a>
+                                        </audio>
+                                        <video *ngIf="dataElement.previewtype==4" src="{{dataElement.previewLink}}" controls class="previewLink">
+                                                Dein Browser ist nicht in der Lage folgenden Link anzuzeigen: <a>{{dataElement.previewLink}}</a>
+                                        </video>
+
+                                        <div *ngIf="dataElement.previewtype==5" class="previewLink">
+                                            <object [data]="dataElement.previewLink | safePipe" type="application/pdf" width="100%">
+                                                Dein Browser ist nicht in der Lage folgenden Link anzuzeigen: <a>{{dataElement.previewLink}}</a>
+                                            </object>                                  
+                                        </div>
+
+                                        <div *ngIf="dataElement.previewtype==6" class="previewLink">
+                                            <div class="youtube_container"> 
+                                                <iframe [src]="dataElement.previewLink | safePipe" frameborder="0" allowfullscreen></iframe>
+                                            </div>
+                                        </div>
+                                        Dies ist eine Vorschau. M&ouml;chtest du die angezeigte Datei hochladen? 
+                                    </div>
+                                    <span *ngIf="!dataElement.previewLink">Das hochgeladene File ist leider zu gross f&uuml;r eine Vorschau. M&ouml;chtest du es ohne Vorschau hochladen? </span>
+                                    <a (click)="dataElement.datatype=dataElement.previewtype;saveDataFile(dataElement);dataElement.datalink=false;">Ja</a> | 
+                                    <a (click)="dataElement.previewLink=false;dataElement.showPreview=false;dataElement.previewType=false">Nein</a>
+                                
+                                </div>
+                            </div>
+                            <div *ngIf="(dataElement.datalink&&dataElement.datalink!=''&&dataElement.datatype!=8)||(dataElement.datatype==1&&dataElement.datalayout==1)" [@fade]="dataElement.datalink ? 'show': 'hide'">
+                                <div *ngIf="dataElement.datatype==2">
+                                    <img src="{{dataElement.datalink}}" class="previewLink">
+                                </div>
+
+                                <div *ngIf="dataElement.datatype!=1">
+                                    <div *ngIf="dataElement.datatype!=2">
+                                        <div *ngIf="dataElement.datatype==3">
+                                            <audio id="audio_with_controls" style="margin-top:40px;" controls src="{{dataElement.datalink}}" type="audio/mp3" class="previewLink">
+                                                Dein Browser ist nicht in der Lage folgenden Link anzuzeigen: <a>{{dataElement.previewLink}}</a>
+                                            </audio>
+                                        </div>
+
+                                        <div *ngIf="dataElement.datatype==4">
+                                            <video src="{{dataElement.datalink}}" controls class="previewLink">
+                                                Dein Browser ist nicht in der Lage folgenden Link anzuzeigen: <a>{{dataElement.previewLink}}</a>
+                                            </video>
+                                        </div>
+
+                                        <div *ngIf="dataElement.datatype==6">
+                                            <div class="youtube_container"> 
+                                                <iframe [src]="dataElement.datalink | safePipe" frameborder="0" allowfullscreen></iframe>
+                                            </div>
+                                        </div>
+                                        <div class="distance"></div>
+                                        <div class="infoTitleContainer">
+                                            <div class="infoTitle infoTitleJodit">Ersatzquelle (nur Print)</div>
+                                            <jodit-editor [(ngModel)]="dataElement.datareplacement_source"
+                                            (onClick)="insertReference($event, dataElement, 'data', 'datareplacement_source');dataElement.contentCheckTextClicked=true;"
+                                            (change)="dataElement.contentCheckTextClicked&&dataElement.contentCheckAnalysis=true"
+                                            (onBlur)="dataTextReplaceTags(dataElement.dataid, 'replacement_source')"
+                                            [config]="jodit_config"></jodit-editor>
+                                        </div>
+                                        <div class="infoTitleContainer" *ngIf="!dataElement.datareplacement_image" [@fade]>
+                                            <div class="infoTitle infoTitleJodit">Ersatztext (nur Print)</div>
+                                            <jodit-editor [(ngModel)]="dataElement.datareplacement_text"
+                                            (onClick)="insertReference($event, dataElement, 'data', 'datareplacement_text');dataElement.contentCheckTextClicked=true;"
+                                            (change)="dataElement.contentCheckTextClicked&&dataElement.contentCheckAnalysis=true" 
+                                            [config]="jodit_config"></jodit-editor>
+                                        </div>
+                                        <div class="newDataContainer" style="cursor:default">
+                                            <div class="newDataContainer_field">
+                                                <mat-icon class="list_icon">link</mat-icon>
+                                            </div>
+                                            <div *ngIf="dataElement.tinyurl" class="newDataContainer_text">
+                                                http://cache.ch/{{dataElement.tinyurl}}
+                                            </div>
+                                            <div *ngIf="!dataElement.tinyurl" class="newDataContainer_text">
+                                                Ersatzlink wird beim Speichern erstellt.
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+
+                                    <input #fileUploadReplacement type="file" accept='image/jpg,image/jpeg,image/png' (change)="checkDataFile(dataElement, fileUploadReplacement.files)" style="display:none;"/>
+                                    
+                                    <div *ngIf="(!dataElement.datareplacement_image&&!dataElement.datareplacement_text)&&(activechapter.chapterlocked==0)" [@fade] class="newDataContainer" (click)="fileUploadReplacement.click()">
+                                            <div class="newDataContainer_field">
+                                                <mat-icon class="list_icon">image</mat-icon>
+                                            </div>
+                                            <div class="newDataContainer_text">
+                                                Ersatzbild hochladen
+                                            </div>
+                                        </div>
+                                    <div *ngIf="dataElement.datareplacement_image">
+                                        <div class="newDataContainer" (click)="dataElement.datareplacement_image_show=!dataElement.datareplacement_image_show">
+                                            <div class="newDataContainer_field">
+                                                <mat-icon class="list_icon">image</mat-icon>
+                                            </div>
+                                            <div *ngIf="dataElement.datareplacement_image_show" class="newDataContainer_text">
+                                                Ersatzbild verbergen
+                                            </div>
+                                            <div *ngIf="!dataElement.datareplacement_image_show" class="newDataContainer_text">
+                                                Ersatzbild anzeigen
+                                            </div>
+                                        </div>
+                                        <img *ngIf="dataElement.datareplacement_image_show" src="{{dataElement.datareplacement_image}}" class="previewLink"/>
+                                        <button type="submit" class="btn btn-danger" style="float:left;" (click)="deleteReplacementImage(dataElement.dataid);" *ngIf="activechapter.chapterlocked==0">Eratzbild l&ouml;schen</button>
+                                    </div>
+                                    <div *ngIf="dataElement.previewLink">
+                                        <img src="{{dataElement.previewLink}}" class="previewLink">
+                                        <div style="margin-bottom:10px;">
+                                            Dies ist eine Vorschau. M&ouml;chtest du die angezeigte Datei hochladen?
+                                            <a (click)="dataElement.datareplacement_image=dataElement.previewLink;saveDataFile(dataElement,true);dataElement.previewLink=false;dataElement.previewType=false;">Ja </a> | 
+                                            <a (click)="dataElement.previewLink=false;dataElement.previewType=false">Nein</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="dataElement.datatype==5">
+                                    <object [data]="dataElement.datalink | safePipe" type="application/pdf" width="100%" height="800px">
+                                        Dein Browser ist nicht in der Lage folgenden Link anzuzeigen: <a>{{dataElement.previewLink}}</a>
+                                    </object>
+                                </div>
+
+                                <button *ngIf="(dataElement.datatype==6||dataElement.datatype==5||dataElement.datatype==4||dataElement.datatype==3||dataElement.datatype==2||(dataElement.datatype==1&&dataElement.datalayout==1))&&(activechapter.chapterlocked==0)" type="submit" class="btn btn-danger" (click)="dataElement.datatype=8;dataElement.datalink='';deleteDataFile(dataElement)">Inhalt ändern</button>
+                            </div>
+                        </div>
+
+                        <div class="col" *ngIf="dataElement.datatype!=0&&(dataElement.datatype!=1||dataElement.datalayout!=0)">
+                            <div class="infoTitleContainer">
+                                <div class="infoTitle infoTitleJodit">Quelle des Elements</div>
+                                <jodit-editor [(ngModel)]="dataElement.datasource" (onClick)="insertReference($event, dataElement, 'data', 'datasource');dataElement.contentCheckTextClicked=true;" (change)="dataElement.contentCheckTextClicked&&dataElement.contentCheckAnalysis=true" (onBlur)="dataElement.datasource=textReplaceTagsRegex(dataElement.datasource);"
+                                [config]="jodit_config"></jodit-editor>
+                            </div>
+                            <div *ngIf="dataElement.datatype==1&&dataElement.datalayout==0">
+                                <div class="infoTitleContainer">
+                                    <div class="infoTitle infoTitleJodit">Caption</div>
+                                    <jodit-editor [(ngModel)]="dataElement.datacaption" (onClick)="dataElement.contentCheckTextClicked=true;" (change)="dataElement.contentCheckTextClicked&&dataElement.contentCheckAnalysis=true" (onBlur)="dataElement.datacaption=textReplaceTagsRegex(dataElement.datacaption)"
+                                    [config]="jodit_config"></jodit-editor>
+                                </div>
+                            </div>
+                            <div *ngIf="dataElement.datatype!=1||dataElement.datalayout>0">
+                                <div class="infoTitleContainer">
+                                    <div class="infoTitle infoTitleJodit">Caption</div>
+                                    <jodit-editor [(ngModel)]="dataElement.datacaption"  (onClick)="insertReference($event, dataElement, 'data', 'datacaption');dataElement.insertReference=false;dataElement.contentCheckTextClicked=true;" (change)="dataElement.contentCheckTextClicked&&dataElement.contentCheckAnalysis=true" (onBlur)="dataElement.datacaption=textReplaceTagsRegex(dataElement.datacaption); getDataNumbersOfReference('data');"
+                                    [config]="jodit_config"></jodit-editor>
+                                </div>
+                                <div *ngIf="(dataElement.datareference.length-dataElement.removedReferences)>dataElement.numbersOfReference" class="warning" [@fade]>
+                                    Es sind mehr Referenzen eingetragen, als im Text sind. Bitte l&ouml;sche alle ungenutzen Referenzen.
+                                </div>
+                                <div class="list_container" [ngClass]="{'list_text_autoheight': reference.height}" *ngFor="let reference of dataElement.datareference" [ngStyle]="{'opacity':reference.isDeleted ? '0.4' : '1' }">
+                                    <div class="list_field" style="height:auto;">
+                                        <span *ngIf="!reference.isDeleted">{{reference.referenceposition}}</span>
+                                        <span *ngIf="reference.isDeleted">X</span>
+                                    </div>
+                                    <div class="list_text">
+                                        <div class="list_text_inner" [ngClass]="{'list_text_inner_autoheight': reference.height}">
+                                            <jodit-editor (click)="reference.height=true;" (onBlur)="reference.height=false;reference.referencetext=checkReferenceTextBlur(reference.referencetext)" [(ngModel)]="reference.referencetext" [disabled]="reference.isDeleted"
+                                            [config]="jodit_config_reference"></jodit-editor>
+                                        </div>
+                                    </div>
+                                    <div class="list_field" style="height:auto;">
+                                        <mat-icon class="list_icon" (click)="reference.isDeleted=true;removeReference(dataElement.dataid,reference.referenceposition, 'data')"  matTooltip="delete reference">delete</mat-icon>
+                                    </div>
+                                </div>
+                                <div class="list_container">
+                                    <div class="list_field">
+                                        <mat-icon class="list_icon">add</mat-icon>
+                                    </div>
+                                    <div class="list_text list_text_add" (click)="dataElement.insertReference=true;">
+                                            <span *ngIf="!dataElement.insertReference">Klicke hier um eine neue Referenz einzutragen.</span>
+                                            <span *ngIf="dataElement.insertReference">Klicke nun im Text an die Stelle, an welcher du die Referenz eintragen möchtest.</span>
+                                    </div>
+                                </div>
+                                <div class="infoTitleContainer" *ngIf="dataElement.datatype!=1">
+                                    <div class="infoTitle infoTitleJodit">Quelle der Caption</div>
+                                    <jodit-editor [(ngModel)]="dataElement.datacaptionsource" (onClick)="insertReference($event, dataElement, 'data', 'datacaptionsource');" (change)="dataElement.contentCheckTextClicked&&dataElement.contentCheckAnalysis=true" (onBlur)="dataElement.datacaptionsource=textReplaceTagsRegex(dataElement.datacaptionsource);"
+                                    [config]="jodit_config"></jodit-editor>
+                                </div>
+                            </div>
+
+                            <div class="form-floating">
+                                <select class="form-select" id="layouttype" [(ngModel)]="dataElement.datalayout">
+                                    <option value="1" *ngIf="dataElement.datatype==1">Kleines Zitat</option>
+                                    <option value="2" *ngIf="dataElement.datatype==1">Grosses Zitat</option>
+                                    <option value="0" *ngIf="dataElement.datatype==2">Bild auf ganzer Breite</option>
+                                    <option value="1" *ngIf="dataElement.datatype==2">Bild auf halber Breite</option>
+                                    <option value="0" *ngIf="dataElement.datatype>2">
+                                        <span *ngIf="!dataElement.datareplacement_image">Kleiner Text (Ersatztext PDF)</span>
+                                        <span *ngIf="dataElement.datareplacement_image">Bild auf ganzer Breite (Ersatzbild PDF)</span>
+                                    </option>
+                                    <option value="1" *ngIf="dataElement.datatype>2">
+                                        <span *ngIf="!dataElement.datareplacement_image">Grosser Text (Ersatztext PDF)</span>
+                                        <span *ngIf="dataElement.datareplacement_image">Bild auf halber Breite (Ersatzbild PDF)</span>
+                                    </option>
+                                </select>
+                                <label for="layouttype">Layouttyp</label>
+                            </div>
+
+                            <div class="distance"></div>
+
+
+                            <div *ngIf="dataElement.showComments">
+                                <div class="list_container" style="height:auto" *ngFor="let comment of dataElement.datacomment" [ngStyle]="{'opacity':comment.isDeleted ? '0.4' : '1' }">
+                                    <textarea onlyGrow [minRows]="1" autosize class="list_text list_textarea" [(ngModel)]="comment.commenttext" name="commenttext" [disabled]="comment.isDeleted" placeholder="Gib hier deinen Kommentar ein."></textarea> 
+                                    <div class="list_field list_field_dynamic">
+                                        <mat-icon class="list_icon" (click)="comment.isDeleted=true"  matTooltip="delete reference">delete</mat-icon>
+                                    </div>
+                                </div>
+                                <div class="list_container">
+                                    <div class="list_field">
+                                        <mat-icon class="list_icon">add</mat-icon>
+                                    </div>
+                                    <div class="list_text list_text_add" (click)="addComment(dataElement.dataid)">
+                                        <span>Klicke hier um einen Kommentar hinzuzuf&uuml;gen.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div *ngIf="dataElement.showExternReference">
+                                <div class="infoTitle" style="top: 15px;height: 0px;">Verweislink</div>
+                                <input type="input" class="form-control" [(ngModel)]="dataElement.data_referencelink"  placeholder="Verweislink">
+                                <div class="infoTitle" style="top: 15px;height: 0px;">Verweistext</div>
+                                <input type="input" class="form-control" [(ngModel)]="dataElement.data_referencetext"  placeholder="Verweistext">
+                            </div>
+                            
+                            <ng-container *ngIf="activechapter.chapterlocked==0">
+                                <button type="submit" class="btn btn-success" (click)="saveData(dataElement.dataid);">Daten speichern</button>
+                                <button type="submit" class="btn btn-danger" (click)="dataElement.showDelete=true">Inhalt l&ouml;schen</button>
+                                <button type="submit" class="btn btn-primary" (click)="openAddress()">Verweis hinzuf&uuml;gen</button>
+                            </ng-container>
+
+                            <button type="submit" class="btn btn-primary" (click)="dataElement.showComments=!dataElement.showComments">
+                                <span *ngIf="!dataElement.showComments">Kommentare anzeigen
+                                    <span *ngIf="dataElement.datacomment.length!=0" style="color:red;">({{dataElement.datacomment.length}})</span>
+                                </span>
+                                <span *ngIf="dataElement.showComments">Kommentare verbergen</span>
+                            </button>
+                            <button type="submit" class="btn btn-primary" (click)="dataElement.showExternReference=!dataElement.showExternReference">
+                                <span *ngIf="!dataElement.showExternReference">Externer Verweis anzeigen</span>
+                                <span *ngIf="dataElement.showExternReference">Externer Verweis verbergen</span>
+                            </button>
+
+                            <div *ngIf="dataElement.showDelete" class="error" [@fade]="dataElement.showDelete ? 'show': 'hide'">
+                                Bist du sicher?
+                                <a (click)="deleteData(dataElement);dataElement.contentCheckText=false">Ja</a> | 
+                                <a (click)="dataElement.showDelete=false">Nein</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- data edit fields FINISH -->
+                </li>
+            </div>
+    </ul>
+
+</div>
+
+</div>
+
+<div [ngClass]="workMode?'element_preview_box-work':'element_preview_box element_preview_settings'" *ngIf="previewElementSettings||previewElementShow">
+    <ul class="list-group" [ngStyle]="{'padding':workMode ? '0px' : '20px' }" *ngIf="previewElementSettings">
+        <li class="list-group-item list-header">
+            <span *ngIf="!book">Bitte w&auml;hle zuerst eine Ausgabe aus</span>
+            <span *ngIf="book">PDF Generierung für das Buch {{book[0].bookname}}</span>
+        </li>
+        <li class="list-group-item" *ngIf="book" [@toggle]>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <ul class="list-group list-group_no_margin">
+                            <li class="list-group-item list-group-item-action" [ngClass]="{'list-group-item-primary': previewListType=='editorial'}" (click)="selectPDFPreviewList('editorial')">
+                                Editorial
+                            </li>
+                            <li class="list-group-item list-group-item-action" [ngClass]="{'list-group-item-primary': previewListType=='part'}" (click)="selectPDFPreviewList('part')">
+                                Part
+                            </li>
+                            <li class="list-group-item list-group-item-action" [ngClass]="{'list-group-item-primary': previewListType=='chapter'}" (click)="selectPDFPreviewList('chapter')">
+                                Kapitel
+                            </li>
+                            <li class="list-group-item list-group-item-action" [ngClass]="{'list-group-item-primary': previewListType=='unit'}" (click)="selectPDFPreviewList('unit')">
+                                Unit
+                            </li>
+                            <li class="list-group-item list-group-item-action" [ngClass]="{'list-group-item-primary': previewListType=='replic'}" (click)="selectPDFPreviewList('replic')">
+                                Replik
+                            </li>
+                            <li class="list-group-item list-group-item-action" [ngClass]="{'list-group-item-primary': previewListType=='page'}" (click)="selectPDFPreviewList('page')">
+                                Seitenzahlen auswählen
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <ng-container *ngIf="previewListType!='editorial'">
+
+
+                            <select *ngIf="previewListType!='page'" class="form-select" [(ngModel)]="previewListId">
+                                <option *ngFor="let previewList of previewListList" [(ngValue)]="previewList.id">{{previewList.name}}</option>
+                            </select>
+                            <div *ngIf="previewListType=='page'" style="width:100%;height:38px;">
+                                <input type="text" class="form-control" style="float:left;width:60px;" [(ngModel)]="previewListFirstpage">
+                                <div class="element_preview_list_pages_line">- </div>
+                                <input type="text" class="form-control" style="float:left;width:60px;" [(ngModel)]="previewListLastpage" placeholder="{{previewListFirstpage}}">
+                            </div>
+                        </ng-container>
+                        <div class="form-check" style="margin-top:10px;">
+                            <input type="checkbox" class="form-check-input" [(ngModel)]="previewListReplacecontent">
+                            <label class="form-check-label" >PDF mit hinterlegten Ersatzbildern</label><br/>
+                        </div>
+                        <button type="submit" class="btn btn-success" (click)="loadPDFPreviewList()">PDF generieren</button>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+
+    <ul class="list-group" [ngStyle]="{'padding':workMode ? '0px' : '20px' }" [@fade] *ngIf="previewElementShow">
+        <li class="list-group-item list-header">
+            PDF Vorschau
+            <span style="float:right;cursor:pointer;margin-top:-2px;">
+                <a href="{{previewElementFileLink}}" target="_blank">
+                    <span matTooltip="PDF downloaden">
+                        <mat-icon>cloud_download</mat-icon>
+                    </span>
+                </a>
+            </span>
+        </li>
+        <li class="list-group-item" *ngIf="book" [@toggle] style="padding:0 !important">
+            <div [ngClass]="workMode?'element_preview_box_pdf-work':'element_preview_box'" style="z-index:23;margin:0">
+                <div [ngClass]="workMode?'iframe_box-work':'iframe_box'">
+                    <iframe class="iframe_frame" frameBorder="0" #iframe>
+                    </iframe>
+                    <div [ngClass]="workMode?'element_preview_pages-work':'element_preview_pages'" style="border-left:0">
+                        Buch {{book[0].bookname}}
+                        <span style="float:right;">
+                        Seite {{previewElementFirstpage}}
+                        <span *ngIf="previewElementFirstpage!=previewElementLastpage"> - {{previewElementLastpage}}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+
+</div>
+
+<div class="element_address_box" *ngIf="createAddress||moveObject">
+    <div class="row">
+        <div class="col">
+            <div class="form-group" *ngIf="partListAddress" [@fade]>
+                <ul class="list-group list-group_no_margin">
+                    <li class="list-group-item list-header">
+                        Part
+                    </li>
+                    <div id="partListAdress">
+                        <ng-container *ngFor="let partAddress of partListAddress">
+                            <li *ngIf="!(partAddress.partname=='Editorial'&&moveObject)" class="list-group-item list-group-item-action" (click)="selectElementAddress(partAddress.partid, 'part')">{{partAddress.partname}}</li>
+                        </ng-container>
+                    </div>
+                </ul>
+            </div>
+            <div class="form-group" *ngIf="partListAddress" [@fade] style="margin-top:10px;" (click)="setAddressImpressum()">
+                <ul class="list-group list-group_no_margin">
+                    <li class="list-group-item list-group-item-action" style="max-height:200px;">
+                        Autor*innenverzeichnis von Buch {{book[0].bookname}} im Impressum
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group" *ngIf="chapterListAddress" [@fade]>
+                <ul class="list-group list-group_no_margin">
+                    <li class="list-group-item list-header">
+                        Kapitel
+                    </li>
+                    <div id="chapterListAddress">
+                        <li class="list-group-item list-group-item-action" *ngFor="let chapterAddress of chapterListAddress" (click)="selectElementAddress(chapterAddress.chapterid, 'chapter')">{{chapterAddress.chaptername}}</li>
+                    </div>
+                </ul>
+            </div>
+        </div>
+        <div class="col" >
+            <div class="form-group" *ngIf="unitListAddress&&(createAddress||moveObject.moveTo=='unit')" [@fade]>
+                <ul class="list-group list-group_no_margin">
+                    <li class="list-group-item list-header">
+                        Unit
+                    </li>
+                    <div id="unitlist">
+                        <li class="list-group-item list-group-item-action" *ngFor="let unitAddress of unitListAddress" (click)="selectElementAddress(unitAddress.unitid, 'unit')">{{unitAddress.unitname}}</li>
+                    </div>
+                </ul>
+            </div>
+        </div>
+        <div class="col" *ngIf="!moveObject">
+            <div class="form-group" *ngIf="dataListAddress" [@fade]>
+                <ul class="list-group list-group_no_margin">
+                    <li class="list-group-item list-header">
+                        Element
+                    </li>
+                    <div id="unitlist">
+                        <li class="list-group-item list-group-item-action" *ngFor="let data of dataListAddress" (click)="activedataAddress=data;generateAddress()">
+                            <div *ngIf="data.datatype!=7">
+                                {{datatypes[data.datatype]}}
+                                <span *ngIf="data.datatype==1&&data.datalayout==0">Haupttext</span>
+                                <span *ngIf="data.datatype==1&&data.datalayout==1">Zitat klein</span>
+                                <span *ngIf="data.datatype==1&&data.datalayout==2">Zitat gross</span>
+                                <span *ngIf="data.datatype==2&&data.datalayout==0">gross</span>
+                                <span *ngIf="data.datatype==2&&data.datalayout==1">klein</span>
+                                ({{data.dataposition}})
+                                <span  style="float:right;" matTooltip="Vorschau des Elements in der Print-Version" (click)="loadPDFPreviewPages('element',data.dataid);">
+                                    <mat-icon>portrait</mat-icon>
+                                </span>
+                            </div>
+                        </li>
+                    </div>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+    <div class="newAddressLink" *ngIf="!moveObject">
+        <div class="newDataContainer_field">
+            <mat-icon class="list_icon">link</mat-icon>
+        </div>
+        <div class="newDataContainer_text">
+            {{linkAddress}}
+            <span style="float:right;font-weight:bold;cursor:pointer;" *ngIf="linkAddress" (click)="setAddress()">Verweis einsetzen</span>
+        </div>
+    </div>
+</div>
+
+
+<div class="element_preview_background" style="z-index:22" (click)="hidePDFPreview();" [ngStyle]="{'display':((previewElementShow||previewElementSettings)&&!workMode) ? 'block' : 'none' }"></div>
+<div class="element_preview_background" (click)="moveObject=false;resetAddress();" [ngStyle]="{'display':(createAddress||moveObject) ? 'block' : 'none' }"></div>

@@ -1,0 +1,581 @@
+<div id="book" *ngIf="frontendService.booklistLoaded&&frontendService.activeBook">
+    <div [@megamenuAnimation]="megamenuState" class="megamenu">
+        <div class="megamenu_close cross" (click)="megamenuClose()"></div>
+        <div class="megamenu_distance"></div>
+        <div *ngFor="let part of frontendService.activeBook.partlist;trackBy: trackByFn" class="megamenu_container">
+            <div class="megamenu_part" [ngStyle]="(!part.partname || part.partname.trim() === '') ? {'display':'none'} : {}">
+                <span class="megamenu_cursor megamenu_glow" (click)="megamenuClick(part.partid)">
+                    <span class="megamenu_baseline_strut"></span>
+                    <span class="megamenu_baseline_text_part">{{part.partname}}</span>
+                </span>
+            </div>
+            <div class="megamenu_chapter" *ngIf="part.partid!=1">
+                <div *ngFor="let chapter of part.chapterlist;trackBy: trackByFn; let first = first;">
+                    <div [ngClass]="first?'megamenu_chapter_first':'megamenu_chapter_other'">
+
+                        <div *ngIf="chapter.chapterweb==1">
+                            <span *ngIf="!frontendService.activeChapter||frontendService.activeChapter.chapterid!=chapter.chapterid" class="megamenu_cursor megamenu_glow" (click)="megamenuClick(part.partid,chapter.chapterid)">
+                                <span class="megamenu_baseline_text">{{chapter.chaptername}}</span>
+                                <span class="megamenu_baseline_strut"></span>
+                            </span>
+                            <span *ngIf="frontendService.activeChapter&&frontendService.activeChapter.chapterid==chapter.chapterid">
+                                <div class="megamenu_circle" [ngClass]="first?'megamenu_circle_first':'megamenu_circle_other'"></div>
+                                <span class="megamenu_baseline_text">{{chapter.chaptername}}</span>
+                                <span class="megamenu_baseline_strut"></span>
+                            </span>
+                        </div>
+
+                        <div *ngIf="chapter.chapterweb==0">
+                            <span class="megamenu_baseline_text megamenu_chapter_unofficial">{{chapter.chaptername}}</span>
+                            <span class="megamenu_baseline_strut"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <div *ngIf="!frontendService.mobileVersion">
+        <div id="book_title" [@booktitleAnimation]="booktitleState">
+            <div class="booktitle_triangle_left" (click)="frontendService.openBook(frontendService.activeBook.bookid)" *ngIf="frontendService.activeBookState=='unit'" [@fade]></div>
+            <div id="book_title_text" (click)="frontendService.openBook(frontendService.activeBook.bookid)">
+                <div id="book_title_container">
+                    <span class="book_baseline_text">{{frontendService.activeBook.bookname}}</span>
+                    <span class="book_baseline_strut"></span>
+                </div>
+            </div>
+                <div id="book_title_part_chapter" (click)="megamenuOpen()" [@booktitleChapterAnimation]="booktitleState" *ngIf="frontendService.activeState=='book'&&frontendService.activeBookState=='unit'"> 
+                    <span class="book_baseline_text">{{frontendService.activePart.partname}}<span *ngIf="!(!frontendService.activePart.partname || frontendService.activePart.partname.trim() === '')">/</span>{{frontendService.activeChapter.chaptername}}</span>
+                    <span class="book_baseline_strut"></span>
+                </div>
+        </div>
+        <div id="book_info">
+            <div id="book_name">
+                <span id="book_name_text">{{frontendService.activeBook.bookname}}</span>
+                <span id="book_name_strut"></span>
+            </div>
+            <div id="book_abstract">
+                <div [innerHTML]="frontendService.activeBook.abstract | sanitizeHtml"></div>
+                <div class="infobox_right  infobox_right_startpage" (click)="frontendService.openLink(frontendService.activeBook.orderlink)" *ngIf="frontendService.activeBook.orderlink!=''">
+                    <ng-container *ngIf="frontendService.activeBook.language=='DE'">Printausgabe bestellen</ng-container>
+                    <ng-container *ngIf="frontendService.activeBook.language=='EN'">Order print edition</ng-container>
+                </div>
+                <div class="infobox_right infobox_right_startpage infobox_right_startpage_second" (click)="frontendService.openLink(frontendService.activeBook.bookpdf)" *ngIf="frontendService.activeBook.bookpdf&&frontendService.activeBook.bookpdf!=''">
+                    <ng-container *ngIf="frontendService.activeBook.language=='DE'">Digitale Version (PDF)</ng-container>
+                    <ng-container *ngIf="frontendService.activeBook.language=='EN'">Digital Version (PDF)</ng-container>
+                </div>
+            </div>
+        </div>
+        <div *ngFor="let part of frontendService.activeBook.partlist;trackBy: trackByFn" class="part"
+            [attr.id]="'partlist'+part.partid"
+            [@partlistAnimation]="{value: part.partlistState, params:{partlistAnimationZIndex:part.partlistAnimationZIndex, partlistAnimationTop: part.partlistAnimationTop, partlistAnimationBottom: frontendService.windowHeight}}"
+            (@partlistAnimation.done)="partlistAnimationDone(part.partid, $event)">
+            <div class="new_part_register" [@partregisterAnimation]="part.partregisterState">
+                    <div class="new_part_register_box">
+                        <div class="new_part_register_part_container">
+                            <div class="new_part_register_part_container_inner">
+                                <div class="new_part_register_line_left"></div>
+                                <div class="new_part_register_part new_part_register_part_list"
+                                    (click)="clickPartTitle(part.partid)">
+                                        
+                                    <span class="new_part_register_text" [attr.id]="'partlist_title'+part.partid">
+                                        <span class="new_part_register_strut"></span>{{part.partname || frontendService.activeBook.bookname }}</span>
+
+                                </div>
+                                <div class="new_part_register_line_right"></div>
+                            </div>
+                        </div>
+                        <div class="new_part_register_chapter" [@partregisterchapterAnimation]="part.partregisterchapterState">
+                            <div class="part_chapterlist_text_container">
+                                <div class="part_chapterlist_text" *ngFor="let chapter of part.chapterlist;trackBy: trackByFn" [attr.id]="'chapterlist_title'+chapter.chapterid">
+                                    <div *ngIf="chapter.chapterweb==1||part.partname=='Editorial'" (mouseover)="chapter.showAuthor=true" (mouseout)="chapter.showAuthor=false">
+                                        <div class="part_chapterlist_title_container" (click)="frontendService.openBook(frontendService.activeBook.bookid,part.partid,chapter.chapterid)" [@chapterlistTitleAnimation]="chapter.chapterlistTitleState">
+                                            <div class="new_part_register_chapter_inner">
+                                                <div class="part_chapterlist_title">
+                                                    <span class="partlist_baseline_text">
+                                                        {{chapter.chaptername}}
+                                                    </span>
+                                                </div>
+                                                <div class="part_chapterlist_author" *ngIf="part.part_showauthorweb==1&&chapter.showAuthor&&chapter.author.length>0&&frontendService.activeBookState == 'part'" >
+                                                    <span *ngFor="let author of chapter.author;trackBy: trackByFn; let isLast=last">
+                                                        {{author.authorfirstname}} {{author.authorsurname}}{{isLast ? '' : ', '}}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="chapter.chapterweb==0&&part.partname!='Editorial'">
+                                        <div class="part_chapterlist_title_container" [@chapterlistTitleAnimation]="chapter.chapterlistTitleState">
+                                            <div class="new_part_register_chapter_inner">
+                                                <div class="part_chapterlist_title part_chapterlist_title_unofficial">
+                                                    <span class="partlist_baseline_text">
+                                                        <span class="part_chapterlist_title_inner">{{chapter.chaptername}}</span>
+                                                        <span class="partlist_baseline_text_releasedate" *ngIf="chapter.chapterreleasedate!=''">{{chapter.chapterreleasedate}}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="part_background_image_container" [@partimagecontainerAnimation]="part.partimagecontainerState" (@partimagecontainerAnimation.done)="partimagecontainerAnimationDone($event)">
+                        <div class="part_background_image_container_inner">
+                            <div  *ngIf="part.images" class="part_background_image"
+                                [@partimageAnimation]="{value: part.partimageState1, params:{partImageFadeTime:partImageFadeTime}}"
+                                [ngStyle]="{'background-image':'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(238,238,238,0) 200px), url(\'' + part.image1 + '\')'}"
+                                style="opacity:0"></div>
+                            <div  *ngIf="part.images&&part.image2" class="part_background_image"
+                                [@partimageAnimation]="{value: part.partimageState2, params:{partImageFadeTime:partImageFadeTime}}"
+                                [ngStyle]="{'background-image':'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(238,238,238,0) 200px), url(\'' + part.image2 + '\')'}"
+                                style="opacity:0"></div>
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="part_text_background"></div>-->
+                <div class="part_close cross" (click)="frontendService.openBook(frontendService.activeBook.bookid)" *ngIf="frontendService.activeBookState=='part'" [@fade]></div>
+            <p style="clear:both"></p>
+        </div>
+
+        <div *ngFor="let part of frontendService.activeBook.partlist;trackBy: trackByFn;let partindex = index" [hidden]="frontendService.activeBook.activePartOldId!=part.partid"
+            class="part_unit_container" (click)="unitClick($event)" [@unitContainerAnimation]="part.unitContainerState"
+            (@unitContainerAnimation.done)="unitContainerAnimationDone($event)"
+            [ngStyle]="{'zIndex': animationUnitToNextPart||(activeBookStateOld=='unit'&&frontendService.activePart&&frontendService.activePart.partregisterState!='show') ? '10' : '-3' }">
+            <div class="unit_outer" *ngFor="let chapter of part.chapterlist;trackBy: trackByFn; let chapterindex = index; let lastChapter = last">
+                <div class="unit" *ngFor="let unit of chapter.unitlist;trackBy: trackByFn; let firstUnit = first; let lastUnit = last; let index = index"
+                [attr.id]="'unit'+unit.unitid" [ngStyle]="{'z-index': -(chapterindex*100+index)}" [@unitAnimation]="unit.unitState"
+                (@unitAnimation.done)="unitAnimationDone($event)">
+                    <div *ngIf="firstUnit" class="new_part_register">
+                        <div class="new_part_register_line_unit"></div>
+                        <div class="new_part_register_part new_part_register_part_unit" (click)="frontendService.openBook(frontendService.activeBook.bookid, part.partid)">
+                            <div class="new_part_register_text">
+                                <div class="part_chapterlist_title">
+                                    <span class="partlist_baseline_text">
+                                        {{part.partname || frontendService.activeBook.bookname }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="new_part_register_chapter new_part_register_chapter_unit">
+                            <div class="new_part_register_chapter_inner" >
+                                <div class="part_chapterlist_title" [attr.id]="'chapterlist_title_unit'+chapter.chapterid">
+                                    <span class="partlist_baseline_text">
+                                        {{chapter.chaptername}}
+                                    </span>
+                                </div>
+                                <div class="part_chapterlist_author chapter_chapterlist_author" *ngIf="part.part_showauthorweb==1&&chapter.author.length>0"
+                                    [attr.id]="'chapterlist_title_unit_author'+chapter.chapterid">
+                                    <span *ngFor="let author of chapter.author;trackBy: trackByFn; let isLast=last">
+                                        {{author.authorfirstname}} {{author.authorsurname}}{{isLast ? '' : ', '}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="new_part_register_pdf" *ngIf="chapter.chapterpdf!=''" (click)="frontendService.openLink(chapter.chapterpdf)">pdf</div>
+                    </div>
+                    <div *ngIf="firstUnit" class="new_part_placeholder"></div>
+                    <div class="unit_inner" *ngIf="(index==frontendService.activeUnitKey&&chapterindex==frontendService.activeChapterKey)||unit.unitLoaded">
+                        <div class="unit_distance_title_to_height" *ngIf="firstUnit" [ngStyle]="{height:chapter.chaptertitleheight}"></div>
+                        <div class="unit_title unit_title_top unit_element_100" *ngIf="unit.unitname!='Editorial'">{{unit.unitname}}</div>
+                        <div class="unit_title unit_element_100" *ngIf="unit.unitname=='Editorial'"></div>
+                        <div *ngFor="let data of unit.datalist;trackBy: trackByFn" [attr.id]="'data_element_'+data.dataid" >
+                            <div *ngIf="data.datatype==1"> <!-- Textelement -->
+                                <div *ngIf="data.datalayout==0"> <!-- Lead-Text -->
+                                    <div class="unit_element_100">
+                                        <div class="infobox_right infobox_right_text" *ngIf="data.data_referencetext&&data.data_referencelink"
+                                        (click)="frontendService.openLink(data.data_referencelink)">
+                                        <div class="infobox_triangle_right"></div>{{data.data_referencetext}}</div>
+                                        <div class="unit_text_l" [innerHtml]="data.datatext | sanitizeHtml"></div>
+                                    </div>
+                                </div>
+                                <div *ngIf="data.datalayout==1">
+                                    <div class="unit_element_33"> <!-- kleines Zitat -->
+                                        <div class="infobox_right" *ngIf="data.data_referencetext&&data.data_referencelink"
+                                        (click)="frontendService.openLink(data.data_referencelink)">
+                                        <div class="infobox_triangle_right"></div>{{data.data_referencetext}}</div>
+                                        <div class="unit_text_m" [innerHtml]="data.datatext | sanitizeHtml"></div>
+                                        <div class="unit_text_s" [innerHtml]="data.datasource | sanitizeHtml" *ngIf="data.datasource"></div>
+                                        <div class="unit_text_m" [innerHtml]="data.datacaption | sanitizeHtml" *ngIf="data.datacaption"></div>
+                                    </div>
+                                </div>
+                                <div *ngIf="data.datalayout==2"> <!-- grosses Zitat -->
+                                    <div class="unit_element_100 unit_text_xl">
+                                        <div class="infobox_right" *ngIf="data.data_referencetext&&data.data_referencelink"
+                                        (click)="frontendService.openLink(data.data_referencelink)">
+                                        <div class="infobox_triangle_right"></div>{{data.data_referencetext}}</div>
+                                        <div [innerHtml]="data.datatext | sanitizeHtml"></div>
+                                    </div>
+                                    <div class="unit_element_50">
+                                        <div class="unit_text_s" [innerHtml]="data.datasource | sanitizeHtml" *ngIf="data.datasource"></div>
+                                        <div class="unit_text_m" [innerHtml]="data.datacaption | sanitizeHtml" *ngIf="data.datacaption"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="data.datatype==2"> <!-- BILD -->
+                                <div *ngIf="data.datalayout==0"> <!-- Bild auf ganzer Breite -->
+                                    <div class="unit_element_100">
+                                        <div class="infobox_right" *ngIf="data.data_referencetext&&data.data_referencelink"
+                                        (click)="frontendService.openLink(data.data_referencelink)"><div class="infobox_triangle_right"></div>{{data.data_referencetext}}</div>
+                                        <div class="unit_image_placeholder" [ngStyle]="{width: data.imagePlaceholderWidth + 'px', height: data.imagePlaceholderHeight + 'px'}">
+                                            <div class="unit_image_loader"></div>
+                                            <img *ngIf="frontendService.activeUnit.unitid==unit.unitid" [src]="data.datalink"
+                                            [@imageAnimation]="data.imageState" (load)="data.imageState='show'" class="unit_media" (click)="goImagePreview(data)">
+                                        </div>
+                                    </div>
+                                    <div class="unit_element_50">
+                                        <div class="unit_text_s" [innerHtml]="data.datasource | sanitizeHtml" *ngIf="data.datasource"></div>
+                                        <div class="unit_text_m" [innerHtml]="data.datacaption | sanitizeHtml" *ngIf="data.datacaption"></div>
+                                        <div class="unit_text_s" [innerHtml]="data.datacaptionsource | sanitizeHtml" *ngIf="data.datacaptionsource"></div>
+                                    </div>
+                                </div>
+                                <div *ngIf="data.datalayout==1"> <!-- Bild auf halber Breite -->
+                                    <div class="unit_element_50">
+                                        <div class="infobox_right" *ngIf="data.data_referencetext&&data.data_referencelink"
+                                        (click)="frontendService.openLink(data.data_referencelink)">
+                                            <div class="infobox_triangle_right"></div>{{data.data_referencetext}}
+                                        </div>
+                                        <div class="unit_image_placeholder" [ngStyle]="{width: data.imagePlaceholderWidth + 'px', height: data.imagePlaceholderHeight + 'px'}">
+                                            <div class="unit_image_loader"></div>
+                                            <img *ngIf="frontendService.activeUnit.unitid==unit.unitid" [src]="data.datalink" [@imageAnimation]="data.imageState"
+                                            (load)="data.imageState='show'" class="unit_media" (click)="goImagePreview(data)">
+                                        </div>
+                                        <div class="unit_text_s" [innerHtml]="data.datasource | sanitizeHtml" *ngIf="data.datasource"></div>
+                                        <div class="unit_text_m" [innerHtml]="data.datacaption | sanitizeHtml" *ngIf="data.datacaption"></div>
+                                        <div class="unit_text_s" [innerHtml]="data.datacaptionsource | sanitizeHtml" *ngIf="data.datacaptionsource"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="data.datatype==3||data.datatype==4||data.datatype==6"> <!-- Video & Audio-->
+                                <div>
+                                    <div class="unit_element_50">
+                                        <div *ngIf="data.datatype==3" class="unit_media">
+                                            <audio id="audio_with_controls" controls class="unit_audio" src="{{data.datalink}}" type="audio/mp3">
+                                                Dein Browser ist nicht in der Lage folgenden Link anzuzeigen: <a>{{data.previewLink}}</a>
+                                            </audio>
+                                        </div>
+                                        <div *ngIf="data.datatype==4" class="unit_media">
+                                            <video src="{{data.datalink}}" controls class="unit_video">
+                                                Dein Browser ist nicht in der Lage folgenden Link anzuzeigen: <a>{{data.previewLink}}</a>
+                                            </video>
+                                        </div>
+                                        <div *ngIf="data.datatype==6" class="unit_media">
+                                            <div *ngIf="frontendService.checkYoutube(data.datalink)">
+                                                <div class="youtube_placeholder" *ngIf="!data.datalink_youtube" (click)="data.datalink_youtube=true">
+                                                    <img *ngIf="frontendService.activeUnit.unitid==unit.unitid" [src]="frontendService.replaceYoutubeEmbedImage(data.datalink)">
+                                                    <span>▶</span>
+                                                </div>
+                                                <div *ngIf="data.datalink_youtube">
+                                                    <iframe [src]="frontendService.replaceYoutubeEmbed(data.datalink) | safePipe" frameborder="0" allowfullscreen class="unit_video"></iframe>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="!frontendService.checkYoutube(data.datalink)">
+                                                <iframe [src]="frontendService.replaceYoutubeEmbed(data.datalink) | safePipe" frameborder="0" allowfullscreen class="unit_video"></iframe>
+                                            </div>
+                                        </div>
+                                        <div class="unit_text_s" [innerHtml]="data.datasource | sanitizeHtml" *ngIf="data.datasource"></div>
+                                        <div class="unit_text_m" [innerHtml]="data.datacaption | sanitizeHtml" *ngIf="data.datacaption"></div>
+                                        <div class="unit_text_s" [innerHtml]="data.datacaptionsource | sanitizeHtml" *ngIf="data.datacaptionsource"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="lastUnit">
+                            <div class="unit_title unit_title_small unit_element_100" *ngIf="chapter.referencelist.length!=0">
+                                <ng-container *ngIf="frontendService.activeBook.language=='DE'">Anmerkungen</ng-container>
+                                <ng-container *ngIf="frontendService.activeBook.language=='EN'">Notes</ng-container>
+                            </div>
+                            <div class="unit_text_s unit_element_100">
+                                <div *ngFor="let reference of chapter.referencelist;trackBy: trackByFn; let index = index">
+                                    <div class="reference_number">{{(index+1)}}</div>
+                                    <div class="reference_text" [innerHTML]="reference.referencetext | sanitizeHtml"></div>
+                                </div>
+                            </div>
+                            <div *ngIf="chapter.chapterfurtherreading!=''">
+                                <div class="unit_title unit_title_small unit_element_100">
+                                    <ng-container *ngIf="frontendService.activeBook.language=='DE'">Weiterf&uuml;hrende Literatur</ng-container>
+                                    <ng-container *ngIf="frontendService.activeBook.language=='EN'">Further Readings</ng-container>
+                                    </div>
+                                <div class="unit_text_s unit_element_100" [innerHTML]="chapter.chapterfurtherreading | sanitizeHtml"></div>
+                            </div>
+                            <div *ngIf="lastChapter" class="new_part_placeholder"></div>
+                        </div>
+                        <p class="unit_bottom"></p>
+                        <div class="unit_swipe_right_area"
+                            [ngStyle]="{'cursor': !animationUnitToNextPart ? 'url(../../assets/images/Pfeil_rechts.png) 0 65, auto;' : 'url(../../assets/images/Pfeil_unten.png) 0 65, auto;' }"
+                            (click)="goUnitSlideLeft()"></div>
+                        <div class="unit_swipe_left_area" (click)="goUnitSlideRight()"></div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="transition_next_element_image" *ngIf="animationUnitToNextPart&&frontendService.activeBookState=='unit'"
+        [ngStyle]="{'background-image':'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(238,238,238,0) 200px), url(\'' + transitionNextElementImage + '\')'}" ></div>
+    </div>
+
+    <div *ngIf="frontendService.mobileVersion&&frontendService.activeState!='blog'">
+        <div id="partoverview" [@mobileContainerAnimation]="mobilePartoverviewState">
+            <div id="book_container" *ngIf="frontendService.mobileVersion">
+                <div id="book_title_text">
+                    <span class="book_baseline_text book_baseline_text_mobile">{{frontendService.activeBook.bookname}}</span>
+                    <span class="book_baseline_strut"></span>
+                </div>
+            </div>
+            <div id="book_abstract">
+                <div [innerHTML]="frontendService.activeBook.abstract | sanitizeHtml"></div>
+                <div class="infobox_right  infobox_right_startpage" (click)="frontendService.openLink(frontendService.activeBook.orderlink)" *ngIf="frontendService.activeBook.orderlink!=''">
+                    <ng-container *ngIf="frontendService.activeBook.language=='DE'">Printausgabe bestellen</ng-container>
+                    <ng-container *ngIf="frontendService.activeBook.language=='EN'">Order print edition</ng-container>
+                </div>
+                <div class="infobox_right  infobox_right_startpage infobox_right_startpage_second"
+                    (click)="frontendService.openLink(frontendService.activeBook.bookpdf)"
+                    *ngIf="frontendService.activeBook.bookpdf&&frontendService.activeBook.bookpdf!=''">
+                        <ng-container *ngIf="frontendService.activeBook.language=='DE'">Digitale Version (PDF)</ng-container>
+                        <ng-container *ngIf="frontendService.activeBook.language=='EN'">Digital Version (PDF)</ng-container>
+                    </div>
+                <p style="clear:both"></p>
+            </div>
+            <div *ngFor="let part of frontendService.activeBook.partlist;trackBy: trackByFn"
+                class="part_mobile" [ngStyle]="{'background-image':'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(238,238,238,0) 200px), url(\'' + part.image1 + '\')'}"
+                (click)="frontendService.openBook(frontendService.activeBook.bookid, part.partid)">
+                <div class="part_mobile_register">
+                    <div class="part_mobile_register_line_left"></div>
+                    <div class="part_mobile_register_text">
+                        <span class="partlist_baseline_text">{{part.partname}}</span>
+                        
+                    </div>
+                    <div class="part_mobile_register_line_right"></div>
+                </div>
+            </div>
+        </div>
+        <div id="chapterheader" [@mobileChapterheaderAnimation]="mobileChapterheaderState" #chapterheader>
+            <div id="chapterheader_booktitle">
+                <div id="chapterheader_booktitle_triangle"></div>
+                <div id="chapterheader_booktitle_container" (click)="frontendService.openBook(frontendService.activeBook.bookid)">
+                    <span class="chapterheader_booktitle_text">{{frontendService.activeBook.bookname}}</span>
+                    <span class="chapterheader_booktitle_strut"></span>
+                </div>
+                <div id="chapterheader_booktitle_container_chapter" (click)="megamenuOpen()" *ngIf="mobileChapterheaderState=='fixed'"> 
+                    <span class="chapterheader_booktitle_text">{{frontendService.activePart.partname}}/{{frontendService.activeChapter.chaptername}}</span>
+                </div>
+            </div>
+        </div>
+        <div id="chapteroverview" [@mobileContainerAnimation]="mobilePartState">
+            <div *ngFor="let part of frontendService.activeBook.partlist;trackBy: trackByFn; let last=last; let first=first; let index=index"
+            class="chapteroverview_mobile" [@mobileChapterContainerAnimation]="part.chapterContainerState" [ngStyle]="{zIndex: 30+(-1)*part.partposition }">
+                <div class="part_mobile_register">
+                    <div class="part_mobile_register_line_left"></div>
+                    <div class="part_mobile_register_text">
+                        <span class="partlist_baseline_text">{{part.partname}}</span>
+                        <span class="partlist_baseline_strut"></span>
+                    </div>
+                    <div class="part_mobile_register_line_right"></div>
+                </div>
+                <div class="part_chapterlist_container">
+                    <div *ngFor="let chapter of part.chapterlist;trackBy: trackByFn">
+                        <div *ngIf="chapter.chapterweb==1||part.partname=='Editorial'" (click)="frontendService.openBook(frontendService.activeBook.bookid,part.partid,chapter.chapterid)">
+                            <div class="part_chapterlist_title">
+                                <span class="partlist_baseline_text">{{chapter.chaptername}}</span>
+                                <span class="partlist_baseline_strut"></span>
+                            </div>
+                        </div>
+                        <div *ngIf="chapter.chapterweb==0&&part.partname!='Editorial'">
+                                <div class="part_chapterlist_title part_chapterlist_title_unofficial">
+                                    <span class="partlist_baseline_text">{{chapter.chaptername}}</span>
+                                    <span class="partlist_baseline_strut"></span>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="part_chapterlist_arrow" *ngIf="!last" (click)="frontendService.openBook(frontendService.activeBook.bookid, frontendService.activeBook.partlist[index+1].partid)"></div>
+                <div class="part_chapterlist_arrow part_chapterlist_arrow_top" *ngIf="!first" (click)="frontendService.openBook(frontendService.activeBook.bookid, frontendService.activeBook.partlist[index-1].partid)"></div>
+                <div class="part_background_image_container_inner">
+                    <div  *ngIf="part.image1" class="part_background_image"
+                    [@partimageAnimation]="{value: part.partimageState1, params:{partImageFadeTime:partImageFadeTime}}"
+                    [ngStyle]="{'background-image':'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(238,238,238,0) 200px), url(\'' + part.image1 + '\')'}" style="opacity:0"></div>
+                    <div  *ngIf="part.images&&part.image2" class="part_background_image"
+                    [@partimageAnimation]="{value: part.partimageState2, params:{partImageFadeTime:partImageFadeTime}}"
+                    [ngStyle]="{'background-image':'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(238,238,238,0) 200px), url(\'' + part.image2 + '\')'}" style="opacity:0"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="unitoverview" *ngIf="frontendService.activePartKey!=-1" [@mobileContainerAnimation]="mobileUnitState">
+            <div class="unit_loader"></div>
+                <div *ngFor="let chapter of frontendService.activePart.chapterlist;trackBy: trackByFn; let chapterlast=last; let chapterfirst=first; let chapterindex=index">
+                    <div *ngFor="let unit of chapter.unitlist;trackBy: trackByFn; let unitlast=last; let firstUnit=first; let unitindex=index"
+                    class="unit_mobile_container" [@mobileUnitContainerAnimation]="unit.unitContainerState" [ngStyle]="{zIndex: (-1)*(chapterindex*100+unitindex) }">
+                        <div class="unit_mobile" [attr.id]="'unit'+unit.unitid" (click)="unitClick($event)">
+                            <div *ngIf="firstUnit" classe="unit_mobile_register">
+                                <div class="unit_mobile_register_line"></div>
+                                <div class="unit_mobile_register_part" (click)="frontendService.openBook(frontendService.activeBook.bookid, frontendService.activePart.partid)">
+                                    <div class="unit_mobile_register_text">{{frontendService.activePart.partname}}</div>
+                                </div>
+                                <div class="unit_mobile_register_chapter">
+                                    <div class="unit_mobile_register_text" [attr.id]="'unit_mobile_register_chapter'+chapter.chapterid">{{chapter.chaptername}}</div>
+                                    <div class="unit_mobile_register_chapter_author" [attr.id]="'unit_mobile_register_chapter_authors'+chapter.chapterid" *ngIf="frontendService.activePart.part_showauthorweb==1&&chapter.author.length>0">
+                                        <span *ngFor="let author of chapter.author;trackBy: trackByFn; let isLast=last">
+                                            {{author.authorfirstname}} {{author.authorsurname}}{{isLast ? '' : ', '}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="unit_mobile_register_pdf" *ngIf="chapter.chapterpdf!=''" (click)="frontendService.openLink(chapter.chapterpdf)">pdf</div>
+                            </div>
+                            <div class="unit_mobile_content">
+                                <div class="unit_distance_title_to_height" [ngStyle]="{height: this.frontendService.activeChapter.chaptertitleheight}"></div>
+                                <div class="unit_title" *ngIf="unit.unitname!='Editorial'">{{unit.unitname}}</div>
+                                <div class="unit_title_editorial" *ngIf="unit.unitname=='Editorial'"></div>
+                                <div *ngFor="let data of unit.datalist;trackBy: trackByFn" [attr.id]="'data_element_'+data.dataid" >
+                                    <div *ngIf="data.datatype==1"> <!-- Textelement -->
+                                        <div *ngIf="data.datalayout==0"> <!-- Lead-Text -->
+                                            <div class="unit_mobile_element_full">
+                                                <div class="infobox_right infobox_mobile" *ngIf="data.data_referencetext&&data.data_referencelink"
+                                                (click)="frontendService.openLink(data.data_referencelink)"><div class="infobox_triangle_right"></div>{{data.data_referencetext}}</div>
+                                                <div class="unit_text_l" [innerHtml]="data.datatext | sanitizeHtml"></div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="data.datalayout==1">
+                                            <div class="unit_mobile_element_right"> <!-- kleines Zitat -->
+                                                <div class="infobox_right infobox_mobile" *ngIf="data.data_referencetext&&data.data_referencelink"
+                                                (click)="frontendService.openLink(data.data_referencelink)"><div class="infobox_triangle_right"></div>{{data.data_referencetext}}</div>
+                                                <div class="unit_text_m" [innerHtml]="data.datatext | sanitizeHtml"></div>
+                                                <div class="unit_text_s" [innerHtml]="data.datasource | sanitizeHtml" *ngIf="data.datasource"></div>
+                                                <div class="unit_text_m" [innerHtml]="data.datacaption | sanitizeHtml" *ngIf="data.datacaption"></div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="data.datalayout==2"> <!-- grosses Zitat -->
+                                            <div class="unit_mobile_element_full unit_text_xl">
+                                                <div class="infobox_right infobox_mobile" *ngIf="data.data_referencetext&&data.data_referencelink"
+                                                (click)="frontendService.openLink(data.data_referencelink)"><div class="infobox_triangle_right"></div>{{data.data_referencetext}}</div>
+                                                <div [innerHtml]="data.datatext | sanitizeHtml"></div>
+                                            </div>
+                                            <div class="unit_mobile_element_full">
+                                                <div class="unit_text_s" [innerHtml]="data.datasource | sanitizeHtml" *ngIf="data.datasource"></div>
+                                                <div class="unit_text_m" [innerHtml]="data.datacaption | sanitizeHtml" *ngIf="data.datacaption"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="data.datatype==2"> <!-- BILD -->
+                                        <div class="unit_mobile_element_full">
+                                            <div class="infobox_right infobox_mobile" *ngIf="data.data_referencetext&&data.data_referencelink" (click)="frontendService.openLink(data.data_referencelink)"><div class="infobox_triangle_right"></div>{{data.data_referencetext}}</div>
+                                            <div class="unit_image_placeholder" [ngStyle]="{width: data.imagePlaceholderWidth + 'px', height: data.imagePlaceholderHeight + 'px'}">
+                                                <div class="unit_image_loader"></div>
+                                                <img *ngIf="frontendService.activeUnit.unitid==unit.unitid"  [src]="data.datalink" [@imageAnimation]="data.imageState" (load)="data.imageState='show'" class="unit_media">
+                                            </div>
+                                        </div>
+                                        <div class="unit_mobile_element_right">
+                                            <div class="unit_text_s" [innerHtml]="data.datasource | sanitizeHtml" *ngIf="data.datasource"></div>
+                                            <div class="unit_text_m" [innerHtml]="data.datacaption | sanitizeHtml" *ngIf="data.datacaption"></div>
+                                            <div class="unit_text_s" [innerHtml]="data.datacaptionsource | sanitizeHtml" *ngIf="data.datacaptionsource"></div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="data.datatype==3||data.datatype==4||data.datatype==6"> <!-- Video & Audio-->
+                                        <div>
+                                            <div class="unit_mobile_element_full">
+                                                <div *ngIf="data.datatype==3" class="unit_media">
+                                                    <audio id="audio_with_controls" controls class="unit_audio" src="{{data.datalink}}" type="audio/mp3">
+                                                        Dein Browser ist nicht in der Lage folgenden Link anzuzeigen: <a>{{data.previewLink}}</a>
+                                                    </audio>
+                                                </div>
+        
+                                                <div *ngIf="data.datatype==4" class="unit_media">
+                                                    <video src="{{data.datalink}}" controls class="unit_video">
+                                                        Dein Browser ist nicht in der Lage folgenden Link anzuzeigen: <a>{{data.previewLink}}</a>
+                                                    </video>
+                                                </div>
+        
+                                                <div *ngIf="data.datatype==6" class="unit_media">
+                                                    <div *ngIf="frontendService.checkYoutube(data.datalink)">
+                                                        <div class="youtube_placeholder" *ngIf="!data.datalink_youtube" (click)="data.datalink_youtube=true">
+                                                            <img *ngIf="frontendService.activeUnit.unitid==unit.unitid" [src]="frontendService.replaceYoutubeEmbedImage(data.datalink)">
+                                                            <span>▶</span>
+                                                        </div>
+                                                        <div *ngIf="data.datalink_youtube">
+                                                            <iframe [src]="frontendService.replaceYoutubeEmbed(data.datalink) | safePipe" frameborder="0" allowfullscreen class="unit_video"></iframe>
+                                                        </div>
+                                                    </div>
+                                                    <div *ngIf="!frontendService.checkYoutube(data.datalink)">
+                                                        <iframe [src]="frontendService.replaceYoutubeEmbed(data.datalink) | safePipe" frameborder="0" allowfullscreen class="unit_video"></iframe>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="unit_mobile_element_right">
+                                                <div class="unit_text_s" [innerHtml]="data.datasource | sanitizeHtml" *ngIf="data.datasource"></div>
+                                                <div class="unit_text_m" [innerHtml]="data.datacaption | sanitizeHtml" *ngIf="data.datacaption"></div>
+                                                <div class="unit_text_s" [innerHtml]="data.datacaptionsource | sanitizeHtml" *ngIf="data.datacaptionsource"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="unitlast">
+                                    <div class="unit_title unit_mobile_element_full">
+                                        <ng-container *ngIf="frontendService.activeBook.language=='DE'">Anmerkungen</ng-container>
+                                        <ng-container *ngIf="frontendService.activeBook.language=='EN'">Notes</ng-container>
+                                    </div>
+                                    <div class="unit_text_s unit_element_100">
+                                        <div *ngFor="let reference of chapter.referencelist;trackBy: trackByFn; let index = index">
+                                            <div class="reference_number">{{(index+1)}}</div>
+                                            <div class="reference_text" [innerHTML]="reference.referencetext | sanitizeHtml"></div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="chapter.chapterfurtherreading!=''">
+                                        <div class="unit_title unit_element_100">
+                                            <ng-container *ngIf="frontendService.activeBook.language=='DE'">Weiterf&uuml;hrende Literatur</ng-container>
+                                            <ng-container *ngIf="frontendService.activeBook.language=='EN'">Further Readings</ng-container>
+                                        </div>
+                                        <div class="unit_text_s unit_element_100" [innerHTML]="chapter.chapterfurtherreading | sanitizeHtml"></div>
+                                    </div>
+                                </div>
+                                <p style="clear:both"></p>
+                                <div *ngIf="unitlast&&isLastChapter(chapterindex)&&frontendService.activeBook.partlist[getNumber(frontendService.activePartKey)+1]"
+                                class="part_mobile_register part_mobile_register_last ">
+                                    <div class="unit_mobile_register_line unit_mobile_register_line_last"></div>
+                                    <div class="unit_mobile_register_part part_mobile_register_last" (click)="frontendService.openBook(frontendService.activeBook.bookid, frontendService.activeBook.partlist[getNumber(frontendService.activePartKey)+1].partid)">
+                                        <div class="unit_mobile_register_text_last">{{frontendService.activeBook.partlist[getNumber(frontendService.activePartKey)+1].partname}}<div class="unit_mobile_register_strut_last"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p style="clear:both"></p>
+                                <div class="unit_mobile_space_bottom"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="unit_mobile_arrow" (click)="mobileClickArrow(frontendService.activeChapterKey,frontendService.activeUnitKey,-1)"></div>
+                <div class="unit_mobile_arrow unit_mobile_arrow_right" (click)="mobileClickArrow(frontendService.activeChapterKey,frontendService.activeUnitKey,1)"></div>
+        </div>
+    </div>
+
+    <div class="transition_next_element" *ngIf="!frontendService.mobileVersion"
+        [@transitionNextElementAnimation]="transitionNextElementState"
+        (@transitionNextElementAnimation.done)="transitionNextElementAnimationDone($event)">
+        <div class="transision_next_element_background"
+            [@transitionNextElementBackgroundAnimation]="transitionNextElementBackgroundState"
+            (@transitionNextElementBackgroundAnimation.done)="transitionNextElementBackgroundAnimationDone($event)"></div>
+            <div class="transition_next_element_line_left"></div>
+            <div class="transition_next_element_part" (click)="frontendService.openBook(frontendService.activeBook.bookid, frontendService.activeBook.partlist[getNumber(frontendService.activePartKey)+1].partid)">
+                <span class="partlist_baseline_text transition_next_element_text">
+                    {{transitionNextElementPart}}<span class="partlist_baseline_strut"></span>
+                </span>
+            </div>
+            <div class="transition_next_element_line_right"></div>
+    </div>
+
+    <div id="transition_unit_to_unit" *ngIf="!frontendService.mobileVersion" [@transitionUnitToUnitAnimation]="transitionUnitToUnitState" (@transitionUnitToUnitAnimation.done)="transitionUnitToUnitAnimationDone($event)"></div>
+    
+    
+</div>
+
+
+<!-- IMAGE PREVIEW -->
+<div *ngIf="imagePreview" class="image_preview_box">
+    <div class="image_preview_background" (click)="goImagePreviewClose()"></div>
+    <div class="image_preview_close cross" (click)="goImagePreviewClose()"></div>
+    <div id="image_preview_container" [ngStyle]="{'opacity': checkImagePreviewDimensionChecked ? '1' : '0'}">
+        <img id="image_preview_image" [src]="imagePreview.datalink" (load)="checkImagePreviewDimension()">
+        <div id="image_preview_source" [innerHTML]="imagePreview.datasource | sanitizeHtml"></div>
+    </div>
+</div>
+<img class="hiddenImage" [src]="hiddenImage" (load)="hiddenImageLoad()">

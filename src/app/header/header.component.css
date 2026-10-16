@@ -1,0 +1,33 @@
+
+.link-nav{
+    cursor:pointer;
+    text-decoration:none;
+    color:#888;
+}
+
+.container-nav{
+    margin:0 auto;
+    width:100%;
+    text-align:center;
+    color:#888;
+}
+.container-title{
+    float:left;
+}
+.container-user{
+    float:right;
+}
+
+.container-header-in{
+    line-height: 24px;
+    padding: 20px;
+    font-weight: bold;
+    font-size: 18px;
+    color: #555;
+    position: fixed;
+    width: 100%;
+    border-bottom: 1px #DDD solid;
+    z-index: 16;
+    background: #FBFBFB;
+    box-shadow: 0px 3px 3px #EEE;
+}

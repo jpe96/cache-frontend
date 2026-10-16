@@ -1,0 +1,23 @@
+.error{
+    width:100%;
+    line-height:20px;
+    background-color:red;
+    color:white;
+    padding:10px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.list_col{
+    width:33%;
+    float:left;
+}
+
+select{
+    height: 50px;
+    line-height: 30px;
+}
+
+.form-group{
+    margin-bottom:10px !important;
+}

@@ -1,0 +1,277 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin:0px;
+    padding:0px;
+}
+
+.content{
+    margin-top:60px;
+    width:90%;
+    margin-left:5%;
+}
+
+button {
+    background: rgb(1, 29, 51);
+    border: none;
+    color: #fff;
+    font-weight:bold;
+    cursor: pointer;
+    width:100%;
+    border-radius: 0px;
+    text-align:left;
+}
+
+select{
+    font-family: 'Gerstner', sans-serif;
+}
+
+
+.label{
+    width:100%;
+    margin-bottom:10px;
+}
+
+
+.btn{
+    width:auto;
+    margin-right:10px;
+    margin-bottom:10px;
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+
+.list-group{
+    margin-bottom:20px;
+}
+
+.list-group-item{
+    overflow:hidden !important;
+    padding:20px !important;
+    border-radius: 0px !important;
+}
+
+
+.list-group_no_margin{
+    margin:0 !important;
+}
+
+
+.list-group-item-cursor{
+    cursor:auto !important;
+}
+
+.list-group-item-primary{
+    background-color:#efefef;
+    color:black;
+}
+
+.list-group-item-primary:hover{
+    background-color:#eee;
+    color:black;
+}
+
+.list-header{
+    background-color:white;
+    color:black;
+    font-weight:bold;
+    cursor:default;
+    line-height:20px;
+    max-height: 60px;
+}
+
+.list-element{
+    cursor:default;
+}
+
+
+.distance{
+    width:100%;
+    height:10px;
+}
+
+.jodit_container .jodit_toolbar,
+.jodit_container .jodit_statusbar {
+background-color: #cdcdef;
+}
+
+
+.form-check{
+    margin-bottom:12px;
+}
+
+.form-control{
+    margin-bottom:10px;
+}
+
+.error{
+    float:right;
+    line-height:16px;
+    background-color:red;
+    color:white;
+    padding:10px;
+    font-weight:bold;
+}
+
+
+.loadingContainer{
+    position: fixed;
+    z-index: 100;
+    left: 182px;
+    top: 11px;
+}
+
+.lds-ring {
+    display: inline-block;
+    position: relative;
+    width: 40px;
+    height: 40px;
+  }
+  .lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    margin: 8px;
+    border: 6px solid black;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #BBB transparent transparent transparent;
+  }
+  .lds-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+  }
+  .lds-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+  }
+  .lds-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+  }
+  @keyframes lds-ring {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  .infoTitle{
+    color: black;
+    position: relative;
+    top: 9px;
+    z-index: 5;
+    text-align: right;
+    right: 10px;
+    line-height: 15px;
+    float: right;
+}
+
+.infoTitleJodit{
+    position:absolute;
+}
+
+
+.progress_bar{
+    width:100%;
+    height:30%;
+    margin-top:15px;
+    border:1px #DDD solid;
+    position:relative;
+}
+
+.progress_bar_loader{
+    height:30px;
+    width:auto;
+    background-color:#EEE;
+}
+
+.progress_bar_percent{
+    position:absolute;
+    width:100%;
+    line-height:30px;
+    text-align:center;
+    color:#666;
+}
+
+.list_container {
+    width: 100%;
+    height:40px;
+    margin-bottom: 10px;
+    display: flex;
+}
+
+.list_field{
+    height:40px;
+    width:40px;
+    min-width: 40px;
+    line-height:40px;
+    border:1px #CCC solid;
+    color: #AAA;
+    float:left;
+    text-align:center;
+}
+
+.list_field_dynamic{
+    height: auto !important;
+}
+
+.list_text{
+    height:100%;
+    padding:12px;
+    border:1px #CCC solid;
+    border-left:none;
+    border-right:none;
+    float:left;
+    flex-grow: 1;
+    font-size:13px;
+    overflow:hidden;
+}
+
+.list_text_autoheight{
+    height:auto;
+}
+
+.list_text_inner{
+    margin-top: 2px;
+    height: 15px;
+    overflow: hidden;
+}
+
+.list_text_inner_autoheight{
+    height:auto;
+}
+
+.list_textarea{
+    border-left:1px #CCC solid !important;
+    resize: none;
+}
+
+.list_text_add{
+    color: #AAA;
+    border-right:1px #CCC solid;
+    cursor:pointer;
+}
+
+.list_text:disabled{
+    background-color:white;
+}
+
+.list_icon{
+    margin-top: 7px;
+    position:relative;
+    top:50%;
+    margin-top:-12px;
+    cursor:pointer;
+    vertical-align:top;
+}
+
+.warning{
+    width: 100%;
+    padding: 10px;
+    background-color:red;
+    color:white;
+    margin-bottom: 10px;
+}

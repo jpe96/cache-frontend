@@ -1,0 +1,38 @@
+
+<!-- ABOUT -->
+<div *ngIf="frontendService.impressumLoaded&&frontendService.booklistLoaded"
+    [@aboutAnimation]="aboutState" (@aboutAnimation.done)="aboutAnimationDone($event)" id="about">
+    <div id="back_to_book" *ngIf="!frontendService.mobileVersion&&frontendService.lastRouteBook"
+        (click)="frontendService.goBackIntoBook()">
+        <div id="back_to_book_triangle"></div>
+        {{frontendService.lastRouteBook}}
+    </div>
+
+    <div id="about_text">
+
+        <div id="about_title">
+            About cache
+        </div>
+        <div id="about_changelanguage">
+            <div class="about_button_scale about_button_scale_no_margin about_changelanguage_button"
+                [ngClass]="frontendService.language!='de'?'about_changelanguage_button_white':''" (click)="frontendService.language='de'">
+                Deutsch
+            </div>
+            <div class="about_button_scale about_button_scale_no_margin about_changelanguage_button"
+                [ngClass]="frontendService.language!='de'?'':'about_changelanguage_button_white'" (click)="frontendService.language='en'">
+                English
+            </div>
+        </div>
+
+        
+
+        <div [innerHTML]="frontendService.impressum.about_text | sanitizeHtml" *ngIf="frontendService.language=='de'"></div>
+        <div [innerHTML]="frontendService.impressum.about_text_en | sanitizeHtml" *ngIf="frontendService.language=='en'"></div>
+        <div style="width:100%;height:22px"></div>
+        <div class="address" *ngIf="frontendService.language=='de'" (click)="frontendService.openBook(1, 0, 0, 95)">Epilog Gegen|Wissen</div>
+        <div class="address" onclick="window.open('https://www.jhiblog.org/2022/02/16/diy-epistemologies-histories-and-futures-of-publishing-in-the-humanities/', '_blank')">DIY Epistemologies: Histories and Futures of Publishing in the Humanities</div>
+        <div class="address" *ngIf="frontendService.language=='en'" (click)="frontendService.openBook(1, 0, 0, 95)">Epilog Gegen|Wissen (in German)</div>
+    </div>
+
+</div>
+<!-- ABOUT ENDE-->

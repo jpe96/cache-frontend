@@ -1,0 +1,91 @@
+<div class="data-loading" >
+    <svg class="dataspinner" viewBox="25 25 50 50" *ngIf="!booklist" [@fade]>
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+    </svg>
+</div>
+
+<div class="content">
+  <div *ngIf="booklist" [@fade]>
+
+  <ul class="list-group">
+      <li class="list-group-item list-header">
+              <span>Ausgabe</span>
+      </li>
+      <li class="list-group-item list-element" *ngFor="let book of booklist; let i = index">
+          <span (click)="book.showEdit=!book.showEdit" style="cursor: pointer;">{{book.bookname}}</span>
+          <div style="float:right;cursor:pointer" class="maticon-list">
+              <span matTooltip="Buchposition nach oben" [matTooltipDisabled]="book.bookorder == 1" (click)="changeOrder(i, 'up')" [ngStyle]="{'color':book.bookorder == 1 ? '#CCC' : 'black' }">
+                <mat-icon>keyboard_arrow_up</mat-icon>
+              </span>
+              <span matTooltip="Buchposition nach unten" [matTooltipDisabled]="book.bookorder == (booklist.length)" (click)="changeOrder(i, 'down')" [ngStyle]="{'color':book.bookorder == (booklist.length) ? '#CCC' : 'black' }">
+                <mat-icon>keyboard_arrow_down</mat-icon>
+              </span>
+          </div>
+          <div *ngIf="book.showEdit">
+            <div class="edit_line"></div>
+            <div class="form-floating mb-3">
+              <input type="input" class="form-control" [(ngModel)]="book.bookname" id="bookname" placeholder="Neue Ausgabe">
+              <label for="bookname">Ausgabenname</label>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input type="input" class="form-control" [(ngModel)]="book.alertmail" id="alertmail" placeholder="Mailadresse">
+              <label for="alertmail">Mailadressen für Warnungen (mehrere mit ; trennen)</label>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input type="input" class="form-control" [(ngModel)]="book.keywords" id="keywords" placeholder="SEO Keywords (Komma-getrennt)">
+              <label for="keywords">SEO Keywords (Komma-getrennt)</label>
+            </div>
+            
+            <div class="form-floating mb-3">
+              <input type="input" class="form-control" [(ngModel)]="book.orderlink" id="orderlink" placeholder="Bestellink">
+              <label for="orderlink">Bestelllink</label>
+            </div>
+            
+            <div class="form-floating">
+              <select class="form-select" id="public" [(ngModel)]="book.public">
+                <option value="0">Nicht öffentlich</option>
+                <option value="1">Öffentlich</option>
+              </select>
+              <label for="public">Öffentlichkeit der Ausgabe</label>
+            </div>
+
+            <div class="distance"></div>
+
+            <div class="form-floating">
+              <select class="form-select" id="showbook" [(ngModel)]="book.showbook">
+                <option value="0">Nicht sichtbar</option>
+                <option value="1">Sichtbar</option>
+              </select>
+              <label for="showbook">Sichtbarkeit der Ausgabe im Türsteher</label>
+            </div>
+
+            <div class="distance"></div>
+
+            <div class="form-floating">
+              <select class="form-select" id="language" [(ngModel)]="book.language">
+                <option value="DE">Deutsch</option>
+                <option value="EN">Englisch</option>
+              </select>
+              <label for="language">Sprache der Ausgabe</label>
+            </div>
+            
+            <div class="distance"></div>
+
+            <button type="submit" class="btn btn-primary" (click)="saveBook(book.bookid)">Ausgabe speichern</button>
+            <button type="submit" class="btn btn-primary" (click)="book.showdelete=true">Ausgabe löschen</button>
+            <button type="submit" class="btn btn-primary" (click)="book.showEdit=false;">Schliessen</button>
+            <div *ngIf="book.showdelete" class="error">
+              Achtung: du möchtest das Buch <b>{{book.bookname}}</b> löschen.
+              Klicke <u><span style="cursor:pointer" (click)="deleteBook(book.bookid)">hier</span></u> wenn du sicher bist.
+              Falls nicht, klicke <u><span style="cursor:pointer" (click)="book.showdelete=false">hier</span></u>
+            </div>
+          </div>
+      </li>
+      <li class="list-group-item list-element" style="cursor:pointer" (click)="createBook()">
+        <i>Neue Ausgabe erstellen</i>
+      </li>
+    </ul>
+  </div>
+</div>

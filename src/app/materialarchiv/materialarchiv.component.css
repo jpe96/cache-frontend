@@ -1,0 +1,665 @@
+html {
+	min-height: 100vh;
+	height: -webkit-fill-available;
+}
+
+body {
+	height: -webkit-fill-available;
+}
+
+#materialarchiv_circle{
+	position: fixed;
+	top: 30px;
+	right: 30px;
+	width: 100px;
+	height: 100px;
+	background-color: #454545;
+	cursor: pointer;
+	z-index: 1101;
+	border-radius: 50%;
+	display: inline-block;
+	color: white;
+	font-family: cacheMono;
+	text-align: center;
+	line-height: 14px;
+	padding-top: 37px;
+	font-size: 16px;
+	box-shadow: 5px 5px 5px rgba(0,0,0,0.3);
+}
+
+#materialarchiv{
+	position:absolute;
+	width:100vw;
+ 	height:100%;
+    z-index: 400;
+    background: white;
+    overflow: hidden;
+	top:0px;
+	box-shadow: 5px 5px 5px rgba(0,0,0,0.3);
+}
+
+#materialarchiv_content{
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	transition: filter 0.5s;
+}
+
+#materialarchiv_bar_left{
+    position:absolute;
+    left:0px;
+    top:0px;
+    height:100vh;
+    width:40px;
+    background-color:#DEDEDE
+}
+
+
+#materialarchiv_menu_left{
+    margin-left:20px;
+	padding: 10px 15px;
+	z-index:450;
+	background-color:rgba(230,230,229,0.7);
+	border-radius: 22px;
+	position: absolute;
+	backdrop-filter: blur(3px);
+	top: 50%;
+	transform: translate(0, -50%);
+
+}
+
+#materialarchiv_footer{
+	position: fixed;
+	width: 100vw;
+	height: 34px;
+	bottom: 0;
+	background-color: rgba(230,230,229,0.7);
+	backdrop-filter: blur(3px);
+	z-index:450;
+}
+
+#materialarchiv_zoom{
+    position: absolute;
+    margin-left: 35px;
+    margin-top: 4px;
+	z-index: 451;
+}
+
+.materialarchiv_icon{
+	width:15px;
+	height:15px;
+	float:left;
+	cursor:pointer;
+}
+
+.materialarchiv_icon_menu{
+	background-size: 15px;
+	margin-top: 5px;
+}
+
+.materialarchiv_icon_menu_active{
+	background-image: url("../../assets/icons/cache_Active.svg");  
+}
+
+
+.materialarchiv_icon_menu_inactive{
+	background-image: url("../../assets/icons/cache_Inactive.svg");  
+}
+
+.materialarchiv_icon_menu_reload{
+	background-image: url("../../assets/icons/cache_Reload.svg");  
+	background-size: 16px !important;
+	width: 16px !important;
+	height: 16px !important;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+
+.materialarchiv_icon_zoom{
+	margin-top:6px;
+	background-size: 15px;
+	background-repeat: no-repeat;
+	width: 16px;
+	height: 16px;
+	position: absolute;
+	opacity: 1;
+}
+
+.materialarchiv_icon_zoom_hide{
+	opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.materialarchiv_zoom_button_plus_active{
+	background-image: url("../../assets/icons/cache_Plus_active.svg");  
+}
+
+.materialarchiv_zoom_button_plus_inactive{
+	background-image: url("../../assets/icons/cache_Plus_inactive.svg");  
+}
+
+.materialarchiv_zoom_button_minus_active{
+	background-image: url("../../assets/icons/cache_Minus_active.svg");  
+}
+
+.materialarchiv_zoom_button_minus_inactive{
+	background-image: url("../../assets/icons/cache_Minus_inactive.svg");  
+}
+
+.materialarchiv_zoom_button_empty{
+	color:black !important;
+	background-color: rgba(0,0,0,0) !important; 
+	border:2px black solid !important;
+	text-indent: -3px !important;
+	line-height: 6px;
+}
+
+.materialarchiv_zoom_text{
+	float:left;
+	margin: 0px 12px;
+}
+
+.materialarchiv_menu_block{
+    margin-bottom:30px;
+
+}
+
+
+.materialarchiv_menu_select{
+	height:25px;
+	cursor:pointer;
+	white-space: nowrap;
+}
+
+.materialarchiv_menu_text{
+    font-family: CacheMono;
+    font-size: 16px;
+	padding-right:31px;
+	margin-left:23px;
+}
+
+.materialarchiv_menu_rotate_animate{
+	-webkit-transform: scale(1) rotate(0deg);
+	transform: scale(1) rotate(0deg);
+	animation: roate_animate 1s linear;
+}
+
+
+@keyframes roate_animate {
+	0% {
+		-webkit-transform: scale(1) rotate(0deg);
+		transform: scale(1) rotate(0deg);
+	}
+
+	50% {
+		-webkit-transform: scale(0.85) rotate(180deg);
+		transform: scale(0.85) rotate(180deg);
+	}
+
+	100% {
+		-webkit-transform: scale(1) rotate(360deg);
+		transform: scale(1) rotate(360deg);
+	}
+}
+
+#materialarchiv_carpet{
+	position: absolute;
+	overflow-y: scroll;
+	overflow-x: auto;
+	height: 100vh;
+	width: calc(100vw - 30px);
+	left: 30px;
+	padding-top:30px;
+	padding-right:20px;
+}
+
+#materialarchiv_carpet_inner{
+	position:relative;
+	height:100%;
+	width:100%;
+	transition: transform 1.5s;
+	transform: translateX(0) scale(1);
+	transform-origin: 0 0;
+}
+
+.materialarchiv_carpet_column{
+	height: max-content;
+	width: calc(25% - 12px);
+	margin-right: 12px;
+	float: left;
+}
+
+
+.materialarchiv_carpet_column:last-child {
+	margin-right: 0;
+}
+  
+.materialarchiv_carpet_element{
+	height:100%;
+	margin-bottom:30px;
+	cursor:pointer;
+}
+
+.materialarchiv_carpet_image{
+	opacity:0;
+	transition: opacity 1.5s;
+	width:100%;
+}
+
+.materialarchiv_carpet_text{
+	font-size:17px;
+	width:100%;
+	line-height:21px;
+	overflow:hidden;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	animation: fadeIn 1.5s;
+	hyphens: auto;
+}
+
+.materialarchiv_carpet_video_container{
+	position: relative;
+	opacity:0;
+	transition: opacity 1.5s;
+	height: 100%;
+}
+
+.materialarchiv_carpet_video{
+	display: block;
+	height:100%;
+}
+
+.materialarchiv_carpet_video_icon{
+	position: absolute;
+	top: 50%;
+	transform: translate(0, -50%);
+	width: 100%;
+	text-align: center;
+	text-shadow: white 1px 0px 5px;
+}
+
+.materialarchiv_carpet_audio_container{
+	height:100%;
+	background-color:#DDDDDD;
+	font-size:16pt;
+	text-align:center;
+	animation: fadeIn 1.5s;
+}
+
+#materialarchiv_route{
+	position: absolute;
+	overflow-y: hidden;
+	overflow-x: auto;
+	width: calc(100vw);
+	text-align: center;
+	transition: opacity 0.5s;
+	margin-top: 4px;
+}
+
+
+/* Image preview */
+
+#materialarchiv_preview{
+	position:absolute;
+	z-index:500;
+	width:100%;
+	height:100%;
+	left:0px;
+	top:0px;
+	overflow:hidden;
+	opacity:0;
+	transition: opacity 0.5s;
+}
+
+#materialarchiv_preview_background{
+	position:absolute;
+	background:white;
+	opacity:0.5;
+	width:100vw;
+	height:100vw;
+	top:0;
+	left:0;
+}
+
+
+#materialarchiv_preview_element_container{
+	position: absolute;
+	left: 90px;
+	top: 30px;
+	width: calc(100vw - 180px);
+	height: calc(100vh - 140px);
+}
+
+#materialarchiv_preview_element{
+	width:100%;
+	height:100px;
+	padding-bottom: 5px;
+	margin-bottom: 25px;
+	overflow:hidden;
+}
+
+#materialarchiv_preview_loader{
+	position:absolute;
+	width:100%;
+	height:100%;
+	background-image: url("../../assets/images/cache_logo_icon.svg");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 84px 84px;
+	opacity:0;
+	transition: opacity 1s;
+	z-index:499;
+	animation: unit_image_loader_animation 1.5s linear infinite alternate;
+}
+
+.materialarchiv_preview_image{
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+
+}
+
+#materialarchiv_preview_image_hidden{
+	display:none;
+	width:100%;
+	margin-left: auto;
+  	margin-right: auto;
+}
+
+.materialarchiv_preview_text{
+	font-size:26pt;
+	line-height:48px;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+}
+
+#materialarchiv_preview_source{
+	text-align: center;
+	width: 100%;
+	margin-bottom:5px;
+	line-height: 18px;
+}
+
+
+:host ::ng-deep #materialarchiv_preview_source a{
+	color: #333 !important;
+}
+
+
+#materialarchiv_preview_source a{
+	color:#333 !important;
+}
+
+#materialarchiv_preview_route{
+	text-align: center;
+	width: 100%;
+	margin-bottom:15px;
+}
+
+#materialarchiv_preview_image{
+	position:relative;
+	z-index:102;
+	left:50%;
+	transform:translateX(-50%);
+	font-size:14px;
+}
+
+
+
+#materialarchiv_close, #materialarchiv_preview_close {
+	position: absolute;
+	right: 20px;
+	top: 20px;
+	width: 80px;
+	height: 80px;
+	z-index: 600;
+	background: rgba(230,230,230,0.7);
+	padding-left: 10px;
+	border-radius: 40px;
+}
+
+#materialarchiv_close{
+	backdrop-filter: blur(3px);
+}
+
+
+#materialarchiv_close:before, #materialarchiv_close:after, #materialarchiv_preview_close:before, #materialarchiv_preview_close:after {
+	height:62px;
+	background-color: black;
+	width: 1.5px;
+}
+
+#materialarchiv_preview_show_in_book{
+	position: absolute;
+	bottom: 30px;
+	font-size: 14pt;
+	font-family: CacheMono;
+	left: 50%;
+	transform: translateX(-50%);
+	cursor: pointer;
+	border-top: 1px black solid;
+	border-right: 1px black solid;
+	line-height: 16px;
+	padding-top: 6px;
+	padding-right: 8px;
+}
+
+.materialarchiv_preview_arrows{
+	position:absolute;
+	top:calc(50vh - 15px);
+	cursor:pointer;
+	height:30px;
+	width:30px;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+
+
+}
+
+#materialarchiv_preview_arrow_left{
+	left:30px;
+	background-image: url("../../assets/images/triange_black_border_left.svg");
+}
+
+#materialarchiv_preview_arrow_right{
+	right:30px;
+	background-image: url("../../assets/images/triange_black_border_right.svg");
+}
+
+
+
+@keyframes fadeIn {
+	0% { opacity: 0; }
+	100% { opacity: 1; }
+  }
+
+  /* CSS Cross */
+
+:host ::ng-deep .cross{
+	position: absolute;
+	cursor:pointer;
+}
+
+:host ::ng-deep .cross{
+	position: absolute;
+	cursor:pointer;
+}
+
+:host ::ng-deep .cross:before, :host ::ng-deep .cross:after {
+	position: absolute;
+	left: 39px;
+	top:10px;
+	content: ' ';
+ }
+
+:host ::ng-deep .cross:before {
+	transform: rotate(45deg);
+}
+
+:host ::ng-deep .cross:after {
+	transform: rotate(-45deg);
+}
+
+
+
+
+@media only screen and (max-width: 1080px) {
+
+
+	#materialarchiv_carpet{
+		height:100dvh;
+	}
+	
+	#materialarchiv{
+		height:100dvh;
+	}
+
+	.materialarchiv_carpet_text{
+		font-size:14px;
+		width:100%;
+		line-height:18px;
+		margin-top: -4px;
+  		margin-bottom: -3px;
+	}
+
+	#materialarchiv_preview_source{
+		font-size:14px;
+	}
+
+	#materialarchiv_preview_route{
+		font-size:14px;
+	}
+
+	.materialarchiv_carpet_column{
+		width: calc(50% - 10px);
+  		margin-right: 20px;
+	}
+
+	#materialarchiv_menu_left{
+		width: calc(100% - 40px);
+		bottom: 20px;
+		top: auto;
+		transform: none;
+	}
+
+
+	#materialarchiv_close, #materialarchiv_preview_close {
+		position: absolute;
+		right: 20px;
+		top: 20px;
+		width: 41px;
+		height: 41px;
+		z-index: 600;
+		background: rgba(230,230,230,0.7);
+		padding-left: 10px;
+		border-radius: 40px;
+	}
+
+	#materialarchiv_close{
+		backdrop-filter: blur(3px);
+	}
+
+
+	#materialarchiv_close:before, #materialarchiv_close:after, #materialarchiv_preview_close:before, #materialarchiv_preview_close:after {
+		height:30px;
+		background-color: black;
+		width: 1.5px;
+	}
+
+	:host ::ng-deep .cross:before, :host ::ng-deep .cross:after {
+		position: absolute;
+		left: 20px;
+		top: 6px;
+		content: ' ';
+	 }
+
+	#materialarchiv_carpet{
+		width: calc(100vw - 40px);
+	}
+
+	#materialarchiv_preview_show_in_book{
+		font-size:18px;
+	}
+
+	.materialarchiv_preview_arrows{
+		top: auto;
+		bottom: 30px;
+		width: 22px;
+		height: 22px;
+	}
+
+	#materialarchiv_preview_background{
+		height:200%;
+	}
+
+	#materialarchiv_preview_element_container{
+		position: absolute;
+		left: 30px;
+		top: 70px;
+		width: calc(100vw - 60px);
+		height: calc(100dvh - 150px);
+	}
+
+	#materialarchiv_preview_element{
+		background-size: 0px;
+	}
+
+	.materialarchiv_preview_text{
+		font-size:22px;
+		line-height:26px;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+	}
+
+
+	 /* CSS Cross */
+
+	:host ::ng-deep .materialarchiv_menu_close{
+		position: absolute;
+		cursor:pointer;
+	}
+
+	#materialarchiv_menu_close {
+		position: absolute;
+		right: 5px;
+		top: 5px;
+		width: 24px;
+		height: 24px;
+		cursor:pointer;
+	}
+
+	#materialarchiv_menu_close:before, #materialarchiv_menu_close:after {
+		position: absolute;
+		right: 16px;
+		top: 5px;
+		content: ' ';
+		height: 24px;
+		width: 1.5px;
+		background-color: #333;
+	}
+	#materialarchiv_menu_close:before {
+		transform: rotate(45deg);
+	}
+	#materialarchiv_menu_close:after {
+		transform: rotate(-45deg);
+	}
+
+	#materialarchiv_menu_icon{
+		position: absolute;
+		bottom: 20px;
+		right:20px;
+		width:43px;
+		height:43px;
+		background-color:rgba(230,230,229,0.7);
+		border-radius:22px;
+		background-image: url("../../assets/icons/cache_filter.svg");
+		z-index: 600;
+		cursor:pointer;
+		background-repeat: no-repeat;
+    	background-position: center;
+	}
+	
+	
+}

@@ -1,0 +1,372 @@
+<div class="data-loading" >
+    <svg class="dataspinner" viewBox="25 25 50 50" *ngIf="!bloglist||!taglist" [@fade]>
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+    </svg>
+  </div>
+
+<div *ngIf="loading>0&&bloglist&&taglist" class="loadingContainer" [@fade]>
+<div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+</div>
+
+<div class="content" *ngIf="bloglist&&taglist">
+    <ul class="list-group">
+        <li class="list-group-item list-header">
+            <div style="float:left;cursor:pointer;" (click)="showEditBlog=!showEditBlog">
+                <span>Blogeinträge</span>
+                <span *ngIf="showEditBlog"><mat-icon>expand_more</mat-icon></span>
+                <span *ngIf="!showEditBlog"><mat-icon>expand_less</mat-icon></span>
+            </div>
+            <span style="float:right;cursor:pointer;" (click)="addBlog()">Neuer Blogeintrag</span>
+        </li>
+        <div *ngIf="showEditBlog">
+        <li class="list-group-item" *ngFor="let blog of bloglist; let blogIndex = index">
+                <div class="bloglistElement">
+                    <div class="bloglistElementText" (click)="blog.editContent=!blog.editContent">
+                        <span *ngIf="blog.blog_title==''">Neuer Blogeintrag</span>
+                        {{blog.blog_title}}
+                    </div>
+                    <div class="bloglistElementDate">
+                        <span class="pdf_preview_icon"  *ngIf="!(blog.blog_list.length==1&&blog.blog_list[0].blog_listtype==10)" matTooltip="Vorschau des Elements in der Print-Version" (click)="loadPDFPreviewPages(blog.blog_dataid);">
+                            <mat-icon>portrait</mat-icon>
+                        </span>
+
+                        <span class="pdf_preview_icon"  *ngIf="blog.blog_list.length==1&&blog.blog_list[0].blog_listtype==10" matTooltip="Dieser Blogbeitrag ist eine Replik. Zum Anzeigen des PDF's den Menüpunkt Replik nutzen." style="color:gray">
+                            <mat-icon>portrait</mat-icon>
+                        </span>
+                        
+                        {{blog.blog_date | customDate }}
+                    </div>
+                    
+                </div>
+
+                <!-- data edit fields -->
+                <div *ngIf="blog.editContent" class="row bloglistElementContainer" [@toggle]>
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="form-floating" style="margin-bottom: 12px;">
+                                    <select class="form-select" (change)="addTagBlogClick($event.target, blog.blog_dataid);$event.target.value=0;" id="newTags">
+                                        <option value="0">Tag hinzuf&uuml;gen</option>
+                                        <option *ngFor="let tag of taglist" value="{{tag.blog_tagid}}">{{tag.blog_tagname}}</option>
+                                    </select>
+                                    <label for="newTags" style="margin-left: 16px;">Tags:</label>
+                                </div>
+                                <div class="container_4col col-3" style="cursor:default" *ngFor="let tag of blog.blog_taglist;let index = index">
+                                    <div class="container_4col_text container_4col_left" >
+                                        {{tag.blog_tagname}}
+                                    </div>
+                                    <div class="container_4col_field">
+                                        <mat-icon class="list_icon" (click)="deleteTagBlog(blog.blog_dataid, index)">delete</mat-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-floating mb-3">
+                                <input type="input" class="form-control" [(ngModel)]="blog.blog_title" id="blog_title">
+                                <label for="blog_title">Blogtitel</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="input" class="form-control" [(ngModel)]="blog.blog_author" id="blog_author">
+                                <label for="blog_author">Blogautor</label>
+                            </div>
+                            <div class="infoTitle infoTitleJodit_new">Leadtext</div>
+                            <jodit-editor [(ngModel)]="blog.blog_leadtext" [config]="jodit_config" (onBlur)="blog.blog_leadtext=textReplaceTagsRegex(blog.blog_leadtext)"></jodit-editor>
+                            <div class="distance"></div>
+
+                            <mat-form-field appearance="fill">
+                                <input matInput [matDatepicker]="picker3" [(ngModel)]="blog.blog_date" disabled
+                                    style="margin-bottom: 4px;border: 1px #DDD solid; height:60px;">
+                                <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                                <mat-datepicker #picker3 disabled="false"></mat-datepicker>
+                            </mat-form-field>
+
+                            <div class="container_1col">
+                                <div class="container_4col_text container_4col_left">
+                                    <span *ngIf="blog.blog_heroimage==''" (click)="heroimageUpload.click()">Grosses Titelbild (optional)</span>
+                                    {{blog.blog_heroimage}}
+                                </div>
+                                <div class="container_4col_field">
+                                    <mat-icon *ngIf="blog.blog_heroimage!=''" class="list_icon" (click)="blog.blog_heroimage='';saveBlog(blog);">delete</mat-icon>
+                                    <mat-icon *ngIf="blog.blog_heroimage==''" class="list_icon" (click)="heroimageUpload.click()">image</mat-icon>
+                                </div>
+                            </div>
+
+                            <input #heroimageUpload type="file" accept='image/jpg,image/jpeg,image/png' (change)="uploadHeroImage(blog, heroimageUpload.files)" style="display:none;"/>
+                            <div class="error" *ngIf="blog.uploadHeroImageError">Dies ist keine g&uuml;ltige Bilddatei, bitte wähle eine andere.</div>
+                            <div *ngIf="blog.uploadHeroImageRun">
+                                <div class="progress_bar">
+                                    <div [style.width.%]="blog.uploadHeroImageState.message" class="progress_bar_loader">
+                                        <div class="progress_bar_percent">{{blog.uploadHeroImageState.message}} %</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <img [src]="blog.blog_heroimage" *ngIf="blog.blog_heroimage!=''" class="heroimage" />
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" [(ngModel)]="blog.blog_official">
+                                <label class="form-check-label" >Öffentlich</label><br/>
+                            </div>
+                        </div>
+                
+                        <button type="submit" class="btn btn-success" (click)="saveBlog(blog);">Speichern</button>
+                        <button type="submit" class="btn btn-danger" (click)="blog.deleteBlogForm=true">Blogeintrag l&ouml;schen</button>
+                        <div *ngIf="blog.deleteBlogForm" class="error" [@fade]="blog.deleteBlogForm ? 'show': 'hide'">
+                            Möchtest du diesen Blogeintrag wirklich l&ouml;schen?
+                            <a (click)="deleteBlog(blog.blog_dataid);">Ja</a> | 
+                            <a (click)="blog.deleteBlogForm=false">Nein</a>
+                        </div>
+
+                        <hr>
+                        <!-- BLOGINHALT -->
+
+                        <div class="form-floating" style="margin-bottom: 12px;">
+                            <select class="form-select" (change)="addListBlog($event.target.value, blog);$event.target.value=0;" id="newContent"
+                            [disabled]="blog.blog_list.length==1&&blog.blog_list[0].blog_listtype==10">
+                                <option value="0">Inhalt hinzuf&uuml;gen</option>
+                                <option value="1">Text</option>
+                                <option value="2">Bild / Bildergalerie</option>
+                                <option value="4">Medien</option>
+                                <option value="10" *ngIf="blog.blog_list.length==0">Replik</option>
+                            </select>
+                            <label for="newContent">Inhalt:</label>
+                        </div>
+
+                        <div class="blog_content_box" *ngFor="let list of blog.blog_list; let listIndex = index">
+                            <div class="blog_content_box_left ">
+                                <ng-container *ngIf="list.blog_listtype==1"> <!-- TEXT -->
+                                        <div class="infoTitle infoTitleJodit_new">Leadtext</div>
+                                        <jodit-editor [(ngModel)]="list.data[0].blog_texttext" (onClick)="insertReferenceBlog($event, list, blogIndex, listIndex);list.data[0].insertReference=false;" (onBlur)="list.data[0].blog_texttext=textReplaceTagsRegex(list.data[0].blog_texttext);getDataNumbersOfReference(blogIndex,listIndex);"
+                                        [config]="jodit_config"></jodit-editor>
+                                        <div class="distance"></div>
+                                        <div *ngIf="(list.data[0].referencelist.length-list.data[0].removedReferences)>list.data[0].numbersOfReference" class="warning" [@fade]>
+                                            Es sind mehr Referenzen eingetragen, als im Text sind. Bitte l&ouml;sche alle ungenutzen Referenzen.
+                                        </div>
+                                        <div class="list_container" [ngClass]="{'list_text_autoheight': reference.height}" *ngFor="let reference of list.data[0].referencelist" [ngStyle]="{'opacity':reference.isDeleted ? '0.4' : '1' }">
+                                            <div class="list_field" style="height:auto;">
+                                                <span *ngIf="!reference.isDeleted">{{reference.blog_referenceposition}}</span>
+                                                <span *ngIf="reference.isDeleted">X</span>
+                                            </div>
+        
+                                            <div class="list_text">
+                                                <div class="list_text_inner" [ngClass]="{'list_text_inner_autoheight': reference.height}">
+                                                    <jodit-editor (click)="reference.height=true;" (onBlur)="reference.height=false;reference.blog_referencetext=textReplaceTagsRegex(reference.blog_referencetext)" [(ngModel)]="reference.blog_referencetext" [disabled]="reference.isDeleted"
+                                                    [config]="jodit_config_reference"></jodit-editor>
+                                                </div>
+                                            </div>
+                                            <div class="list_field" style="height:auto;">
+                                                <mat-icon class="list_icon" (click)="reference.isDeleted=true;removeReference(blogIndex, listIndex,reference.blog_referenceposition)"  matTooltip="delete reference">delete</mat-icon>
+                                            </div>
+                                        </div>
+                                        <div class="list_container">
+                                            <div class="list_field">
+                                                <mat-icon class="list_icon">add</mat-icon>
+                                            </div>
+                                            <div class="list_text list_text_add" (click)="list.data[0].insertReference=true;">
+                                                <span *ngIf="!list.data[0].insertReference">Klicke hier um eine neue Referenz einzutragen.</span>
+                                                <span *ngIf="list.data[0].insertReference">Klicke nun im Text an die Stelle, an welcher du die Referenz eintragen möchtest.</span>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-success" style="margin-bottom:0px;" (click)="saveTextBlog(list)">Text speichern</button>
+                                </ng-container>
+                                <ng-container *ngIf="list.blog_listtype==2||list.blog_listtype==3"> <!-- BILDER -->
+                                    <div class="blog_image_container">
+                                        <ng-container  *ngFor="let image of list.data; let imageIndex = index">
+                                            <div class="blog_image_box">
+                                                <div class="blog_image_image" [ngStyle]="{'background-image': !image.show_replace ? 'url(\'' + image.blog_imagelink + '\')' : 'url(\'' + image.blog_imagelinkreplace + '\')'}">
+                                                    <div class="blog_image_icons_upper_right">
+                                                        <mat-icon class="blog_image_icons_upper_right_icon" *ngIf="image.blog_imagelinkreplace&&image.blog_imagelinkreplace!=''" matTooltip="Ansicht wechseln zwischen PDF und Webseitenansicht" (click)="image.show_replace = !image.show_replace">swap_vert</mat-icon>
+                                                        <mat-icon class="blog_image_icons_upper_right_icon" *ngIf="!image.blog_imagelinkreplace||image.blog_imagelinkreplace==''" style="color:#DDD">swap_vert</mat-icon>
+                                                        <mat-icon class="blog_image_icons_upper_right_icon" matTooltip="Alternativbild für die PDF-Ansicht hochladen / ersetzen" (click)="imageupload_replace_imageid=image.blog_imageid;imageUpload.click()">present_to_all</mat-icon>
+                                                        <mat-icon class="blog_image_icons_upper_right_icon" *ngIf="image.show_replace" matTooltip="Delete the alternative image for the PDF" (click)="image.blog_imagelinkreplace='';image.show_replace = false; saveImageReplaceBlog(image)">delete_outline</mat-icon>
+                                                    </div>
+                                                    <div *ngIf="image.show_replace" class="blog_image_replaceimage">
+                                                        Ersatzbild
+                                                    </div>
+
+                                                </div>
+                                                <div class="blog_image_bar">
+                                                    <span *ngIf="image.show_replace">{{image.blog_imagelinkreplace}}</span>
+                                                    <span *ngIf="!image.show_replace">{{image.blog_imagelink}}</span>
+                                                    
+                                                    <div class="blog_image_button">
+                                                        <mat-icon *ngIf="image.blog_imageposition==0" style="opacity:0.5">keyboard_arrow_up</mat-icon>
+                                                        <mat-icon *ngIf="image.blog_imageposition!=0" style="cursor:pointer" (click)="changeImagePosition(blogIndex,listIndex,imageIndex,-1)">keyboard_arrow_up</mat-icon>
+                                                        <mat-icon *ngIf="image.blog_imageposition==(list.data.length-1)" style="opacity:0.5">keyboard_arrow_down</mat-icon>
+                                                        <mat-icon *ngIf="image.blog_imageposition!=(list.data.length-1)" style="cursor:pointer" (click)="changeImagePosition(blogIndex,listIndex,imageIndex,1)">keyboard_arrow_down</mat-icon>
+                                                        
+                                                        <mat-icon *ngIf="!image.show_replace" (click)="deleteImageBlog(blogIndex, listIndex, imageIndex)">delete_outline</mat-icon>
+                                                        <mat-icon *ngIf="image.show_replace" style="color:#DDD">delete_outline</mat-icon>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="blog_image_box blog_image_add_box">
+                                                <div class="infoTitle infoTitleJodit_new" style="right: 217px !important;">kommentierte Quellenangabe</div>
+                                                <jodit-editor [(ngModel)]="image.blog_imagesource" [config]="jodit_config" (onBlur)="image.blog_imagesource=textReplaceTagsRegex(image.blog_imagesource)"></jodit-editor>
+                                                <div class="distance"></div>
+                                                <button type="submit" class="btn btn-success" (click)="saveImageBlog(image);">Speichern</button>
+                                            </div>
+                                        </ng-container>
+                                        <div class="blog_image_box blog_image_add_box">
+                                            <div class="container_1col blog_image_add_box_inner" (click)="imageupload_replace_imageid=0;imageUpload.click()">
+                                                <div class="container_4col_text container_4col_left">
+                                                    Bild hochladen
+                                                </div>
+                                                <div class="container_4col_field">
+                                                    <mat-icon class="list_icon">present_to_all</mat-icon>
+                                                </div>
+                                            </div>
+                                            <div class="container_1col blog_image_add_box_inner">
+                                                <div class="container_4col_text container_4col_left">
+                                                    <input placeholder="Link eingeben" class="form-control input_tag"  [(ngModel)]="list.newimageLink" (keydown.enter)="addImageBlogLink(blogIndex, listIndex)" >
+                                                </div>
+                                                <div class="container_4col_field">
+                                                    <mat-icon class="list_icon">insert_link</mat-icon>
+                                                </div>
+                                            </div>
+                                            <input #imageUpload type="file" accept='image/jpg,image/jpeg,image/png' (change)="uploadImageBlog(blogIndex, listIndex, imageUpload.files)" style="display:none;"/>
+                                            <div class="error" *ngIf="list.uploadImageError">Dies ist keine g&uuml;ltige Bilddatei, bitte wähle eine andere.</div>
+                                            <div *ngIf="list.uploadImageRun&&list.uploadImageState">
+                                                <div class="progress_bar progress_bar_blog">
+                                                    <div [style.width.%]="list.uploadImageState.message" class="progress_bar_loader">
+                                                        <div class="progress_bar_percent">{{list.uploadImageState.message}} %</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="list.blog_listtype==4"> <!-- MEDIA -->
+                                    <div class="blog_image_container">
+                                        <ng-container *ngIf="list.data[0].blog_medialink!=''">
+                                            <div class="blog_image_box">
+                                                <div class="blog_image_image">
+                                                    <div *ngIf="list.data[0].blog_mediatype==6">
+                                                        <iframe [src]="list.data[0].blog_medialink | safePipe" class="blog_media_youtube" frameborder="0" allowfullscreen></iframe>
+                                                    </div>
+                                                    <audio *ngIf="list.data[0].blog_mediatype==3" id="audio_with_controls" controls src="{{list.data[0].blog_medialink}}" type="audio/mp3" class="blog_audio">
+                                                        Dein Browser ist nicht in der Lage dieses Audio-File abzuspielen.
+                                                    </audio>
+                                                    <video *ngIf="list.data[0].blog_mediatype==4" controls src="{{list.data[0].blog_medialink}}" type="audio/mp3" class="blog_media_youtube">
+                                                        Dein Browser ist nicht in der Lage dieses Audio-File abzuspielen.
+                                                    </video>
+                                                </div>
+                                                <div class="blog_image_bar">
+                                                        {{list.data[0].blog_medialink}}
+                                                    <div class="blog_image_button" style="width:40px;">
+                                                        <mat-icon (click)="deleteMediaBlog(blogIndex, listIndex)">delete_outline</mat-icon>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="blog_image_box blog_image_add_box">
+                                                <div class="infoTitle infoTitleJodit_new" style="right: 217px !important;">kommentierte Quellenangabe</div>
+                                                <jodit-editor [(ngModel)]="list.data[0].blog_mediasource" [config]="jodit_config" (onBlur)="list.data[0].blog_mediasource=textReplaceTagsRegex(list.data[0].blog_mediasource)"></jodit-editor>
+                                                <div class="distance"></div>
+                                                <button type="submit" class="btn btn-success" (click)="saveMediaBlog(blogIndex, listIndex, list.data[0].blog_mediatype, list.data[0].blog_medialink, list.data[0].blog_mediasource);">Speichern</button>
+                                            </div>
+                                        </ng-container>
+                                        <div class="blog_image_box blog_image_add_box" style="width:48%" *ngIf="list.data[0].blog_medialink==''">
+                                            <div class="container_1col blog_image_add_box_inner" (click)="mediaUpload.click()">
+                                                <div class="container_4col_text container_4col_left">
+                                                    Video oder Audio hochladen
+                                                </div>
+                                                <div class="container_4col_field">
+                                                    <mat-icon class="list_icon">present_to_all</mat-icon>
+                                                </div>
+                                            </div>
+                                            <div class="container_1col blog_image_add_box_inner">
+                                                <div class="container_4col_text container_4col_left">
+                                                    <input placeholder="Link eingeben" class="form-control input_tag"  [(ngModel)]="list.newmedialink" (keydown.enter)="saveMediaBlogCheck(blogIndex, listIndex)" >
+                                                </div>
+                                                <div class="container_4col_field">
+                                                    <mat-icon class="list_icon">insert_link</mat-icon>
+                                                </div>
+                                            </div>
+                                            <input #mediaUpload type="file" accept='audio/mp3,audio/mpeg,video/mov,video/mp4' (change)="uploadMediaBlog(blogIndex, listIndex, mediaUpload.files)" style="display:none;"/>
+                                            <div class="error" *ngIf="blog.uploadMediaError">Dies ist keine gültige Datei, bitte wähle mp3, mpeg, mov oder mp4</div>
+                                            <div *ngIf="list.uploadMediaRun&&list.uploadMediaState">
+                                                <div class="progress_bar progress_bar_blog">
+                                                    <div [style.width.%]="list.uploadMediaState.message" class="progress_bar_loader">
+                                                        <div class="progress_bar_percent">{{list.uploadMediaState.message}} %</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="list.blog_listtype==10"> <!-- MEDIA -->
+                                    <select class="add_list_blog add_tag_blog blog_replic" (change)="saveReplicBlog($event.target.value, blog.blog_dataid);">
+                                        <option value="0">Wähle eine Replik aus</option>
+                                        <option *ngFor="let replic of repliclist" value="{{replic.replicid}}" [selected]="replic.replicid==list.data[0].blog_replicid">{{list.data.blog_replicid}}{{replic.replicheadline}}</option>
+                                    </select>
+                                </ng-container>
+                            </div>
+                            <div class="blog_content_box_right">
+                                <ng-container *ngIf="list.blog_listtype!=10">
+                                    <mat-icon *ngIf="list.blog_listposition==0" style="opacity:0.5">keyboard_arrow_up</mat-icon>
+                                    <mat-icon *ngIf="list.blog_listposition!=0" style="cursor:pointer" (click)="changeListPosition(blogIndex,listIndex,-1)">keyboard_arrow_up</mat-icon>
+                                    <mat-icon *ngIf="list.blog_listposition==(blog.blog_list.length-1)" style="opacity:0.5">keyboard_arrow_down</mat-icon>
+                                    <mat-icon *ngIf="list.blog_listposition!=(blog.blog_list.length-1)" style="cursor:pointer" (click)="changeListPosition(blogIndex,listIndex,1)">keyboard_arrow_down</mat-icon>
+                                    <ng-container *ngIf="list.blog_listtype==2">
+                                        <div class="distance"></div>
+                                        <mat-icon matTooltip="Bilder auf ganze Bildschirmbreite" style="cursor:pointer;">view_stream</mat-icon>
+                                        <mat-icon matTooltip="Bilder auf Artikelbreite" style="cursor:pointer;opacity:0.5" (click)="changeImagetypeBlog(blogIndex,listIndex,3)">view_array</mat-icon>
+                                    </ng-container>
+                                    <ng-container *ngIf="list.blog_listtype==3">
+                                        <div class="distance"></div>
+                                        <mat-icon matTooltip="Bilder auf ganze Bildschirmbreite" style="cursor:pointer;opacity:0.5" (click)="changeImagetypeBlog(blogIndex,listIndex,2)">view_stream</mat-icon>
+                                        <mat-icon matTooltip="Bilder auf Artikelbreite" style="cursor:pointer;">view_array</mat-icon>
+                                    </ng-container>
+                                    <div class="distance"></div>
+                                </ng-container>
+                                <mat-icon style="cursor:pointer" (click)="deleteListBlog(list.blog_listelementid, blog.blog_dataid, listIndex)">delete</mat-icon>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </div>
+    </ul>
+    <ul class="list-group">
+        <li class="list-group-item list-header">
+            <div style="float:left;cursor:pointer;" (click)="showEditTag=!showEditTag">
+                <span>Tags</span>
+                <span *ngIf="showEditTag"><mat-icon>expand_more</mat-icon></span>
+                <span *ngIf="!showEditTag"><mat-icon>expand_less</mat-icon></span>
+            </div>
+            <span style="float:right;cursor:pointer;" (click)="addTag()">Neuen Tag erstellen</span>
+        </li>
+        <div *ngIf="showEditTag">
+        <li class="list-group-item" [@toggle]>
+            <div class="form-group"> 
+                <div class="row">
+                    <div class="container_4col col-3" style="cursor:default" *ngFor="let tag of taglist">
+                        <div class="container_4col_text container_4col_left">
+                            <input type="input" class="form-control input_tag" placeholder="Neuer Tag" (blur)="saveTag(tag)" [(ngModel)]="tag.blog_tagname">
+                        </div>
+                        <div class="container_4col_field">
+                            <mat-icon class="list_icon" (click)="deleteTag(tag.blog_tagid)">delete</mat-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ul>
+</div>
+
+<div class="element_preview_box" style="z-index:23" [@fade] *ngIf="previewElementShow">
+    <div class="iframe_box">
+        <iframe class="iframe_frame" frameBorder="0" #iframe>
+        </iframe>
+        <div class="element_preview_pages">
+            Blogeintrag
+            <span style="float:right;">
+            Seite 1
+            <span> - {{previewElementLastpage}}</span>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="element_preview_background" style="z-index:22" (click)="this.previewElementShow=false;" [ngStyle]="{'display':previewElementShow ? 'block' : 'none' }"></div>
