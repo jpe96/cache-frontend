@@ -46,7 +46,6 @@ import { CustomDatePipe } from './date.pipe';
 import { CustomDateEnPipe } from './date_en.pipe';
 import { DatePipe } from '@angular/common';    
 import { FiterPipe } from './filter.pipe';
-import { BackupComponent } from './backup/backup.component';
 import { LOCALE_ID } from '@angular/core';
 
 import { registerLocaleData } from '@angular/common';
@@ -102,7 +101,6 @@ registerLocaleData(localeDe);
         SafePipePipeHTML,
         CustomDatePipe,
         CustomDateEnPipe,
-        BackupComponent,
         FiterPipe,
         DatenspeicherungComponent,
         DoormanComponent,

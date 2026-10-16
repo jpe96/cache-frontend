@@ -3,6 +3,7 @@ import { BlogService } from './blog.service';
 import { AlertService } from "../alert/alert.service";
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { DatePipe } from '@angular/common';
+import { AppConstants } from '../config/constants';
 
 @Component({
   selector: 'app-blog',
@@ -1006,7 +1007,7 @@ export class BlogComponent implements OnInit {
               this.blogService.generatePdf(data)
               .subscribe((res)=>{
                 this.loading--;
-                if(this.iframe)this.iframe.nativeElement.src = "https://cache.ch/backend/api/pdf/pdfs/cache-"+url_code+".pdf"
+                if(this.iframe)this.iframe.nativeElement.src = AppConstants.restURL+"pdf/pdfs/cache-"+url_code+".pdf"
               });
             }else{
               this.sendAlert(res.data,1);

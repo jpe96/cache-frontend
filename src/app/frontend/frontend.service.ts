@@ -259,9 +259,9 @@ export class FrontendService {
                 for (let part of book.partlist) {
                     for (let image of part.images) {
                       if(this.mobileVersion){
-                        image.imagelink = image.imagelink.replace("https://cache.ch/dataupload", "https://cache.ch/dataupload/web/w_1280");
+                        image.imagelink = image.imagelink.replace(AppConstants.fileBaseUrl + "/dataupload", AppConstants.fileBaseUrl + "/dataupload/web/w_1280");
                       }else{
-                        image.imagelink = image.imagelink.replace("https://cache.ch/dataupload", "https://cache.ch/dataupload/web/w_1920");
+                        image.imagelink = image.imagelink.replace(AppConstants.fileBaseUrl + "/dataupload", AppConstants.fileBaseUrl + "/dataupload/web/w_1920");
                       }
                     }
                     if(part.images&&part.images[0])book.imagesTemp.push(part.images[0].imagelink);
@@ -269,7 +269,7 @@ export class FrontendService {
                       for(let unit of chapter.unitlist){
                         for(let data of unit.datalist){
                           if(data.datatype==2){
-                            data.datalink = data.datalink.replace("https://cache.ch/dataupload", "https://cache.ch/dataupload/web/w_1280");
+                            data.datalink = data.datalink.replace(AppConstants.fileBaseUrl + "/dataupload", AppConstants.fileBaseUrl + "/dataupload/web/w_1280");
                           }
                         }
                       }
@@ -278,8 +278,8 @@ export class FrontendService {
                 }
 
               if(book.imagesTemp.length==0){
-                book.imagesTemp.push('https://cache.ch/dataupload/web/w_1280/Nestl%C3%A9%20Swiss%20Milk.jpg');
-                book.imagesTemp.push('https://cache.ch/dataupload/web/w_1280/Nestl%C3%A9%20Swiss%20Milk.jpg');
+                book.imagesTemp.push(AppConstants.fileBaseUrl + '/dataupload/web/w_1280/Nestl%C3%A9%20Swiss%20Milk.jpg');
+                book.imagesTemp.push(AppConstants.fileBaseUrl + '/dataupload/web/w_1280/Nestl%C3%A9%20Swiss%20Milk.jpg');
               }else if(book.imagesTemp.length==1){
                 book.imagesTemp.push(book.imagesTemp[0]);
               }

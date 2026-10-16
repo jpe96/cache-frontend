@@ -1,4 +1,6 @@
+// Hängt sich bewusst an das fremde <jodit-editor>-Element, deshalb kein app-Präfix
 @Directive({
+  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: 'jodit-editor[trackBlur]',
   standalone: true
 })

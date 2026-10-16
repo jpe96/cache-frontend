@@ -2394,7 +2394,7 @@ export class ContentComponent implements OnInit {
     .subscribe((res)=>{
       console.log(res)
       this.loading--;
-      this.previewElementFileLink = "https://cache.ch/backend/api/pdf/pdfs/cache-"+url_code+".pdf"
+      this.previewElementFileLink = AppConstants.restURL+"pdf/pdfs/cache-"+url_code+".pdf"
       if(this.iframe)this.iframe.nativeElement.src = this.previewElementFileLink
     });
   

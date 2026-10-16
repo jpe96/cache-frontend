@@ -1,27 +1,24 @@
-# Dashboard
+# cache-frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.7.
+Angular-App für [cache.ch](https://cache.ch): öffentliche Seite und Redaktions-CMS (`/admin`).
 
-## Development server
+Dokumentation, Status und Backlog liegen im Repo **cache-resources** (`docs/frontend.md`).
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Entwicklung
 
-## Code scaffolding
+```bash
+npm ci                 # .npmrc setzt legacy-peer-deps (nötig für jodit-angular)
+npx ng serve           # development: spricht gegen das Docker-Mockup aus cache-backend/dev/ (http://localhost:8080)
+npm run lint           # ESLint
+```
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Das Mockup startet man im Repo `cache-backend` mit `docker compose -f dev/docker-compose.yml up -d`
+(Details: `cache-backend/dev/README.md`). CMS-Login im Mockup: `dev` / `dev`.
 
-## Build
+## Build für Produktion
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+```bash
+npx ng build           # production (Default) -> environment.prod.ts -> https://cache.ch, Ausgabe: dist/dashboard/
+```
 
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Die Backend-Adressen stehen in `src/environments/environment*.ts`.

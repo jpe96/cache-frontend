@@ -1,3 +1,5 @@
 export const environment = {
-  production: true
+  production: true,
+  apiUrl: 'https://cache.ch/backend/api/',
+  fileBaseUrl: 'https://cache.ch'
 };

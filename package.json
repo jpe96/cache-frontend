@@ -6,11 +6,10 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "lint": "ng lint"
   },
   "private": true,
-"dependencies": {
+  "dependencies": {
     "@angular/animations": "^14.3.0",
     "@angular/cdk": "^14.0.0",
     "@angular/common": "^14.3.0",
@@ -31,13 +30,21 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^14.2.13",
+    "@angular-eslint/builder": "14.4.0",
+    "@angular-eslint/eslint-plugin": "14.4.0",
+    "@angular-eslint/eslint-plugin-template": "14.4.0",
+    "@angular-eslint/schematics": "14.4.0",
+    "@angular-eslint/template-parser": "14.4.0",
     "@angular/cli": "^14.2.13",
     "@angular/compiler-cli": "^14.3.0",
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",
     "@types/resize-observer-browser": "^0.1.11",
+    "@typescript-eslint/eslint-plugin": "5.43.0",
+    "@typescript-eslint/parser": "5.43.0",
     "core-js": "^3.6.5",
+    "eslint": "^8.28.0",
     "jasmine-core": "~3.8.0",
     "jasmine-spec-reporter": "~5.0.0",
     "jodit": "^3.23.3",
@@ -47,7 +54,6 @@
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
-    "protractor": "~7.0.0",
     "resize-observer-polyfill": "^1.5.1",
     "ts-node": "~8.3.0",
     "typescript": "~4.6.4",
